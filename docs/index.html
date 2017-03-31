@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<meta name="date" content="2017-03-31" />
+
+<title>Second Test Of Cross-wiki Search</title>
+
+<script src="index_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="index_files/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="index_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="index_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="index_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="index_files/navigation-1.1/tabsets.js"></script>
+<script src="index_files/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #303030; color: #cccccc; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #cccccc; background-color: #303030; }
+code > span.kw { color: #f0dfaf; } /* Keyword */
+code > span.dt { color: #dfdfbf; } /* DataType */
+code > span.dv { color: #dcdccc; } /* DecVal */
+code > span.bn { color: #dca3a3; } /* BaseN */
+code > span.fl { color: #c0bed1; } /* Float */
+code > span.ch { color: #dca3a3; } /* Char */
+code > span.st { color: #cc9393; } /* String */
+code > span.co { color: #7f9f7f; } /* Comment */
+code > span.ot { color: #efef8f; } /* Other */
+code > span.al { color: #ffcfaf; } /* Alert */
+code > span.fu { color: #efef8f; } /* Function */
+code > span.er { color: #c3bf9f; } /* Error */
+code > span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+code > span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code > span.sc { color: #dca3a3; } /* SpecialChar */
+code > span.vs { color: #cc9393; } /* VerbatimString */
+code > span.ss { color: #cc9393; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { } /* Variable */
+code > span.cf { color: #f0dfaf; } /* ControlFlow */
+code > span.op { color: #f0efd0; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code > span.at { } /* Attribute */
+code > span.do { color: #7f9f7f; } /* Documentation */
+code > span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code > span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+div.sourceCode {
+  overflow-x: visible;
+}
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+<style type="text/css">
+  p.abstract{
+    text-align: center;
+    font-weight: bold;
+  }
+  div.abstract{
+    margin: auto;
+    width: 90%;
+  }
+</style>
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Second Test Of Cross-wiki Search</h1>
+<h3 class="subtitle"><em>Helping More Users Discover Content On Wikipedia’s Sister Projects</em></h3>
+<h4 class="author"><em>Erik Bernhardson</em></h4>
+<address class="author_afil">
+Senior Software Engineer, Wikimedia Foundation<br><h4 class="author"><em>Jan Drewniak</em></h4>
+<address class="author_afil">
+User Experience Engineer, Wikimedia Foundation<br><h4 class="author"><em>Dan Garry</em></h4>
+<address class="author_afil">
+Product Manager (Search Backend), Wikimedia Foundation<br><h4 class="author"><em>Mikhail Popov</em></h4>
+<address class="author_afil">
+Data Analyst, Wikimedia Foundation<br><h4 class="author"><em>Deb Tankersley</em></h4>
+<address class="author_afil">
+Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>31 March 2017</em></h4>
+<div class="abstract">
+<p class="abstract">Abstract</p>
+…
+</div>
+
+</div>
+
+
+<script type="text/javascript">
+$(function() {
+  /* Lets the user click on the images to view them in full resolution. */
+  $("div.figure img").wrap(function() {
+    var link = $('<a/>');
+    link.attr('href', $(this).attr('src'));
+    link.attr('title', $(this).attr('alt'));
+    link.attr('target', '_blank');
+    return link;
+  });
+  $("p.abstract").text("Executive Summary");
+  $("div#wmf").wrap('<a href="https://wikimediafoundation.org/" />');
+});
+</script>
+<p>
+{ <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar/blob/master/docs/index.Rmd">RMarkdown Source</a> | <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar">Analysis Codebase</a> }
+</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Within the <a href="https://wikimediafoundation.org/wiki/Home">Wikimedia Foundation</a>’s <a href="https://www.mediawiki.org/wiki/Wikimedia_Engineering">Engineering group</a>, the <a href="https://www.mediawiki.org/wiki/Wikimedia_Discovery">Discovery department</a>’s mission is to make the wealth of knowledge and content in the <a href="https://wikimediafoundation.org/wiki/Our_projects">Wikimedia projects</a> (such as <a href="https://www.wikipedia.org/">Wikipedia</a>) easily discoverable. The Search team is responsible for maintaining and enhancing the search features and APIs for MediaWiki, such as language detection – i.e. if a French Wikipedia visitor searches and gets fewer than 3 results, we check if maybe their query is in another language, and if our language detection determines that the query’s language is most likely German (for example), then in addition to results from French Wikipedia, they would also get results from German Wikipedia, if any.</p>
+<p>Specifically, the <a href="https://www.mediawiki.org/wiki/Wikimedia_Discovery/Search">Search team</a>’s current goal is to add cross-wiki searching – that is, providing search results from other (also referred to as “sister”) Wikimedia projects (“<em>wikis</em>”) within the same language. For example, if a work (e.g. a book or poem) on French Wikisource matched the user’s query, that user would be shown results from French Wikisource in addition to any results from French Wikipedia. In our previous report <span class="citation">(<a href="#ref-Prev-report">2017</a>)</span>, we showed that there was some evidence that suggested thsee additional “cross-wiki” search results helped user engagement but due to some issues with the user interface the results were not definitive, and so this test was meant to be a follow-up for us after we corrected those issues.</p>
+<div class="figure" style="text-align: center">
+<img src="index_files/figure-html/example_figure-1.png" alt="**Figure 1**: Example of cross-wiki search results on German Wikipedia, with sister wikis in the sidebar ordered according to recall. Multimedia results (including results from Wikimedia Commons) are shown first, regardless of the sidebar ordering." height="4in" />
+<p class="caption">
+<strong>Figure 1</strong>: Example of cross-wiki search results on German Wikipedia, with sister wikis in the sidebar ordered according to recall. Multimedia results (including results from Wikimedia Commons) are shown first, regardless of the sidebar ordering.
+</p>
+</div>
+<p>For the users who received the experimental user experience (UX), each additional wiki’s top result was shown as a box in a sidebar with a link to view more results (see Figure 1<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>). There were two groups of users who received the experimental UX and one control group that did not:</p>
+<dl>
+<dt><span class="test-group-1">Control</span></dt>
+<dd>This group received the baseline user experience, which only includes the search results from the wiki they are on. To make their experience comparable to the test groups with respect to latency, we performed the search across the additional indices, but did not show the results to the end user.
+</dd>
+<dt><span class="test-group-2">Test</span></dt>
+<dd>This group received the experimental user experience, which includes search results from other wikis (if any were returned). The boxes holding the results (one box for each wiki) were ordered according to recall – the volume of search results returned for each respective wiki.
+</dd>
+</dl>
+<p>The primary questions we wanted to answer are:</p>
+<ul>
+<li><p>Did users who saw the additional cross-wiki results engage with those results?</p></li>
+<li><p>Was the overall engagement with search results better or worse compared to the controls?</p></li>
+</ul>
+<p>On 17 March 2017 we deployed an A/B test on the desktop version of Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias to assess the efficacy of this feature. The test concluded on 28 March 2017, after a total of 42205 search sessions had been anonymously tracked.</p>
+</div>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+<p>This test’s event logging (EL) was implemented in JavaScript according to the <a href="https://meta.wikimedia.org/wiki/Schema:TestSearchSatisfaction2">TestSearchSatisfaction2 (TSS2)</a> schema, which is the one used by the Search team for its metrics on desktop, data was stored in a MySQL database, and analyzed and reported using R <span class="citation">(R Core Team <a href="#ref-R-base">2016</a>)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">import<span class="op">::</span><span class="kw">from</span>(dplyr, group_by, ungroup, <span class="dt">keep_where =</span> filter, mutate, arrange, select, transmute, left_join, summarize, bind_rows, case_when, if_else, rename)
+<span class="kw">library</span>(ggplot2)</code></pre></div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">experiment_nodes &lt;-<span class="st"> </span><span class="kw">c</span>(
+  <span class="st">&quot;Wikipedia visitors on Desktop&quot;</span>,
+  <span class="st">&quot;Arabic (1.21%)&quot;</span>, <span class="st">&quot;Catalan (0.23%)&quot;</span>, <span class="st">&quot;French (5.7%)&quot;</span>, <span class="st">&quot;German (7.18%)&quot;</span>,
+  <span class="st">&quot;Italian (2.81%)&quot;</span>, <span class="st">&quot;Persian (0.57%)&quot;</span>, <span class="st">&quot;Polish (2.01%)&quot;</span>, <span class="st">&quot;Russian (6.6%)&quot;</span>,
+  <span class="st">&quot;Other Languages (73.69%)&quot;</span>,
+  <span class="st">&quot;In A/B Test&quot;</span>, <span class="st">&quot;In EL but not in test&quot;</span>, <span class="st">&quot;Not in Event Logging&quot;</span>,
+  <span class="st">&quot;Test&quot;</span>, <span class="st">&quot;Control&quot;</span>
+)
+experiment_edges &lt;-<span class="st"> </span><span class="kw">list</span>(
+  <span class="st">&quot;Wikipedia visitors on Desktop&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Arabic (1.21%)&quot;</span> =<span class="st"> </span><span class="fl">0.012</span>,
+    <span class="st">&quot;Catalan (0.23%)&quot;</span> =<span class="st"> </span><span class="fl">0.002</span>,
+    <span class="st">&quot;French (5.7%)&quot;</span> =<span class="st"> </span><span class="fl">0.057</span>,
+    <span class="st">&quot;German (7.18%)&quot;</span> =<span class="st"> </span><span class="fl">0.072</span>,
+    <span class="st">&quot;Italian (2.81%)&quot;</span> =<span class="st"> </span><span class="fl">0.028</span>,
+    <span class="st">&quot;Persian (0.57%)&quot;</span> =<span class="st"> </span><span class="fl">0.006</span>,
+    <span class="st">&quot;Polish (2.01%)&quot;</span> =<span class="st"> </span><span class="fl">0.020</span>,
+    <span class="st">&quot;Russian (6.6%)&quot;</span> =<span class="st"> </span><span class="fl">0.066</span>,
+    <span class="st">&quot;Other Languages (73.69%)&quot;</span> =<span class="st"> </span><span class="fl">0.737</span>
+  ),
+  <span class="st">&quot;Other Languages (73.69%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">200</span>,
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">199</span><span class="op">/</span><span class="dv">200</span>
+  ),
+  <span class="st">&quot;Arabic (1.21%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">24</span><span class="op">/</span><span class="dv">25</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">25</span>) <span class="op">*</span><span class="st"> </span><span class="dv">7</span><span class="op">/</span><span class="dv">8</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">25</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">8</span>
+  ),
+  <span class="st">&quot;Catalan (0.23%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">5</span><span class="op">/</span><span class="dv">6</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">6</span>) <span class="op">*</span><span class="st"> </span><span class="dv">33</span><span class="op">/</span><span class="dv">34</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">6</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">34</span>
+  ),
+  <span class="st">&quot;French (5.7%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">69</span><span class="op">/</span><span class="dv">70</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">70</span>) <span class="op">*</span><span class="st"> </span><span class="dv">2</span><span class="op">/</span><span class="dv">3</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">70</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>
+  ),
+  <span class="st">&quot;German (7.18%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">107</span><span class="op">/</span><span class="dv">108</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">108</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">108</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>
+  ),
+  <span class="st">&quot;Italian (2.81%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">41</span><span class="op">/</span><span class="dv">42</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">42</span>) <span class="op">*</span><span class="st"> </span><span class="dv">4</span><span class="op">/</span><span class="dv">5</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">42</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">5</span>
+  ),
+  <span class="st">&quot;Persian (0.57%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">7</span><span class="op">/</span><span class="dv">8</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">8</span>) <span class="op">*</span><span class="st"> </span><span class="dv">24</span><span class="op">/</span><span class="dv">25</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">8</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">25</span>
+  ),
+  <span class="st">&quot;Polish (2.01%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">34</span><span class="op">/</span><span class="dv">35</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">35</span>) <span class="op">*</span><span class="st"> </span><span class="dv">5</span><span class="op">/</span><span class="dv">6</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">35</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">6</span>
+  ),
+  <span class="st">&quot;Russian (6.6%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(
+    <span class="st">&quot;Not in Event Logging&quot;</span> =<span class="st"> </span><span class="dv">70</span><span class="op">/</span><span class="dv">71</span>,
+    <span class="st">&quot;In EL but not in test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">71</span>) <span class="op">*</span><span class="st"> </span><span class="dv">2</span><span class="op">/</span><span class="dv">3</span>,
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span>(<span class="dv">1</span><span class="op">/</span><span class="dv">71</span>) <span class="op">*</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>
+  ),
+  <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Control&quot;</span> =<span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>, <span class="st">&quot;Test&quot;</span> =<span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)
+)</code></pre></div>
+<p>The data was collected according to the <a href="https://meta.wikimedia.org/w/index.php?title=Schema:TestSearchSatisfaction2&amp;direction=next&amp;oldid=15922352">TSS2 schema, revision 16270835</a>. Figure 2 shows the flow of Wikipeda visitors on Desktop. Approximately 26.3%<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> of the unique desktop devices that visit the 270<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> Wikipedias are accounted for by the 8 languages. In general, desktop users are randomly selected for anonymous tracking at a rate of 1 in 200, but for 8 wikis we changed the sampling rates to those shown in Table 1<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>.</p>
+<?xml version="1.0" encoding="UTF-8"?>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<caption>
+<strong>Table 1</strong>: Sampling rates used for event logging (EL) and random selection into the A/B test.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Language
+</th>
+<th style="text-align:left;">
+Chance of getting selected for EL
+</th>
+<th style="text-align:left;">
+Chance of getting into A/B Test
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+arwiki
+</td>
+<td style="text-align:left;">
+Arabic
+</td>
+<td style="text-align:left;">
+1 in 25
+</td>
+<td style="text-align:left;">
+1 in 8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cawiki
+</td>
+<td style="text-align:left;">
+Catalan
+</td>
+<td style="text-align:left;">
+1 in 6
+</td>
+<td style="text-align:left;">
+1 in 34
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+frwiki
+</td>
+<td style="text-align:left;">
+French
+</td>
+<td style="text-align:left;">
+1 in 70
+</td>
+<td style="text-align:left;">
+1 in 3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dewiki
+</td>
+<td style="text-align:left;">
+German
+</td>
+<td style="text-align:left;">
+1 in 108
+</td>
+<td style="text-align:left;">
+1 in 2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+itwiki
+</td>
+<td style="text-align:left;">
+Italian
+</td>
+<td style="text-align:left;">
+1 in 42
+</td>
+<td style="text-align:left;">
+1 in 5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+fawiki
+</td>
+<td style="text-align:left;">
+Persian
+</td>
+<td style="text-align:left;">
+1 in 8
+</td>
+<td style="text-align:left;">
+1 in 25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+plwiki
+</td>
+<td style="text-align:left;">
+Polish
+</td>
+<td style="text-align:left;">
+1 in 35
+</td>
+<td style="text-align:left;">
+1 in 6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ruwiki
+</td>
+<td style="text-align:left;">
+Russian
+</td>
+<td style="text-align:left;">
+1 in 71
+</td>
+<td style="text-align:left;">
+1 in 3
+</td>
+</tr>
+</tbody>
+</table>
+<p>Users who made it into the test were then randomly assigned to one of the three groups described above: <span class="test-group-1">Control</span> and <span class="test-group-2">Test</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ds &lt;-<span class="st"> </span>riverplot<span class="op">::</span><span class="kw">default.style</span>(); ds<span class="op">$</span>col &lt;-<span class="st"> &quot;gray&quot;</span>; ds<span class="op">$</span>srt &lt;-<span class="st"> </span><span class="dv">30</span>
+visitor_flow &lt;-<span class="st"> </span>riverplot<span class="op">::</span><span class="kw">makeRiver</span>(
+  experiment_nodes, experiment_edges,
+  <span class="dt">node_xpos =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">4</span>),
+  <span class="dt">node_styles =</span> <span class="kw">list</span>(
+    <span class="st">&quot;Wikipedia visitors on Desktop&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Arabic (1.21%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Catalan (0.23%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;French (5.7%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;German (7.18%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Italian (2.81%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Persian (0.57%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Polish (2.01%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Russian (6.6%)&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>),
+    <span class="st">&quot;Control&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> RColorBrewer<span class="op">::</span><span class="kw">brewer.pal</span>(<span class="dv">3</span>, <span class="st">&quot;Set1&quot;</span>)[<span class="dv">1</span>]),
+    <span class="st">&quot;Test&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="dt">col =</span> RColorBrewer<span class="op">::</span><span class="kw">brewer.pal</span>(<span class="dv">3</span>, <span class="st">&quot;Set1&quot;</span>)[<span class="dv">2</span>])
+  )
+)
+x &lt;-<span class="st"> </span><span class="kw">plot</span>(visitor_flow, <span class="dt">node_margin =</span> <span class="dv">3</span>, <span class="dt">default_style =</span> ds, <span class="dt">fix.pdf =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="figure">
+<img src="index_files/figure-html/user_flow_plot-1.png" alt="**Figure 2**: Flow of Wikipedia visitors into the A/B test." width="\textwidth" />
+<p class="caption">
+<strong>Figure 2</strong>: Flow of Wikipedia visitors into the A/B test.
+</p>
+</div>
+<p>We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result’s page.</p>
+<p>See Phabricator ticket <a href="https://phabricator.wikimedia.org/T149806">T149806</a> and Gerrit changes , and <a href="https://gerrit.wikimedia.org/r/#/c/343104">343104</a> for full details of the implementation on both back-end and front-end.</p>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 9, 10, and 7.</p>
+</div>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<p>After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of 42305 search sessions with the full breakdown by wiki and group (see Table 2). Table 3 breaks down the counts of clicks on same-wiki results (e.g. a Catalan Wikipedia visitor clicking on a Catalan Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">session_counts &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(<span class="dt">Wiki =</span> wiki, group) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sessions =</span> <span class="kw">length</span>(<span class="kw">unique</span>(session_id))) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">xtabs</span>(sessions <span class="op">~</span><span class="st"> </span>Wiki <span class="op">+</span><span class="st"> </span>group, <span class="dt">data =</span> .) <span class="op">%&gt;%</span>
+<span class="st">  </span>addmargins</code></pre></div>
+<?xml version="1.0" encoding="UTF-8"?>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<caption>
+<strong>Table 2</strong>: Number of search sessions used for analysis by wiki and group. Each search session may have several individual searches.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Control
+</th>
+<th style="text-align:right;">
+Test
+</th>
+<th style="text-align:right;">
+All 2 groups
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Arabic Wikipedia
+</td>
+<td style="text-align:right;">
+2146
+</td>
+<td style="text-align:right;">
+2216
+</td>
+<td style="text-align:right;">
+4362
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Catalan Wikipedia
+</td>
+<td style="text-align:right;">
+2972
+</td>
+<td style="text-align:right;">
+2893
+</td>
+<td style="text-align:right;">
+5865
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+French Wikipedia
+</td>
+<td style="text-align:right;">
+2625
+</td>
+<td style="text-align:right;">
+2683
+</td>
+<td style="text-align:right;">
+5308
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+German Wikipedia
+</td>
+<td style="text-align:right;">
+2643
+</td>
+<td style="text-align:right;">
+2758
+</td>
+<td style="text-align:right;">
+5401
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Italian Wikipedia
+</td>
+<td style="text-align:right;">
+2848
+</td>
+<td style="text-align:right;">
+2782
+</td>
+<td style="text-align:right;">
+5630
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Persian Wikipedia
+</td>
+<td style="text-align:right;">
+2390
+</td>
+<td style="text-align:right;">
+2368
+</td>
+<td style="text-align:right;">
+4758
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Polish Wikipedia
+</td>
+<td style="text-align:right;">
+2514
+</td>
+<td style="text-align:right;">
+2507
+</td>
+<td style="text-align:right;">
+5021
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Russian Wikipedia
+</td>
+<td style="text-align:right;">
+2953
+</td>
+<td style="text-align:right;">
+3007
+</td>
+<td style="text-align:right;">
+5960
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+All 8 wikis
+</td>
+<td style="text-align:right;">
+21091
+</td>
+<td style="text-align:right;">
+21214
+</td>
+<td style="text-align:right;">
+42305
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">click_counts &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(<span class="dt">Group =</span> group, event) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">xtabs</span>(n <span class="op">~</span><span class="st"> </span>Group <span class="op">+</span><span class="st"> </span>event, <span class="dt">data =</span> .) <span class="op">%&gt;%</span>
+<span class="st">  </span>addmargins</code></pre></div>
+<?xml version="1.0" encoding="UTF-8"?>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<caption>
+<strong>Table 3</strong>: Number of click events by group.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Same-wiki clicks
+</th>
+<th style="text-align:right;">
+Sister-project clicks
+</th>
+<th style="text-align:right;">
+Textcat clicks
+</th>
+<th style="text-align:right;">
+Overall clicks
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Control
+</td>
+<td style="text-align:right;">
+13007
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+13008
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Test
+</td>
+<td style="text-align:right;">
+12031
+</td>
+<td style="text-align:right;">
+478
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+12511
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+All 2 groups
+</td>
+<td style="text-align:right;">
+25038
+</td>
+<td style="text-align:right;">
+478
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+25519
+</td>
+</tr>
+</tbody>
+</table>
+<div id="zero-results-rate-zrr" class="section level2">
+<h2>Zero Results Rate (ZRR)</h2>
+<p>The zero results rate (ZRR) – proportion of searches yielding zero results – is one of Discovery’s Search Team’s key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results’ relevance). While we were primarily interested in searchers’ engagement with the search result for this test, we included this section as a consistency check – that the zero results rate is lower when a cross-wiki search is performed (see Figure 9).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">zrr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(
+    <span class="dt">same =</span> <span class="kw">any</span>(<span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>),
+    <span class="dt">sister =</span> <span class="kw">any</span>(<span class="st">`</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>),
+    <span class="dt">either =</span> same <span class="op">||</span><span class="st"> </span>sister
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(
+    <span class="dt">total_searches =</span> <span class="kw">n</span>(),
+    <span class="st">`</span><span class="dt">ZRR when counting just same-wiki results</span><span class="st">`</span> =<span class="st"> </span><span class="kw">sum</span>(<span class="op">!</span>same),
+    <span class="st">`</span><span class="dt">ZRR when including sister-wiki results</span><span class="st">`</span> =<span class="st"> </span><span class="kw">sum</span>(<span class="op">!</span>either)
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span>ungroup <span class="op">%&gt;%</span>
+<span class="st">  </span>tidyr<span class="op">::</span><span class="kw">gather</span>(results, zr_searches, <span class="op">-</span><span class="kw">c</span>(wiki, group, total_searches)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group, results) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>zr_searches, .<span class="op">$</span>total_searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))</code></pre></div>
+<div class="figure">
+<img src="index_files/figure-html/zrr_plot-1.png" alt="**Figure 3**: Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results)." width="\textwidth" />
+<p class="caption">
+<strong>Figure 3</strong>: Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results).
+</p>
+</div>
+<div class="figure">
+<img src="index_files/figure-html/zrr_lang_plot-1.png" alt="**Figure 4**: The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates." width="\textwidth" />
+<p class="caption">
+<strong>Figure 4</strong>: The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.
+</p>
+</div>
+<p>In Figure 4, we broke the ZRR from Figure 3 down by language and project and included a reference marker for each project’s overall ZRR (aggregated across all the languages the project is available in). Almost all of the projects are available (at the time of the test and at the time of writing this report) in Catalan, Italian, Persian, and Polish. Of particular note are the overall ZRR of projects like Wikinews and Wiktionary (both exist in Catalan, Italian, Persian, and Polish), which appear to be much lower than the ZRR observed in this test. In fact, the ZRR in these four languages is much higher than the overall ZRR for every project. We suspect this is partly responsible for the low sister-project click counts seen in Table 3.</p>
+</div>
+<div id="engagement" class="section level2">
+<h2>Engagement</h2>
+<p>We used the clickthrough rate as an indicator of users’ engagement with search results and as a measure of the results’ relevance. That is, if we present users with more relevant results (such as those from Wikipedia’s sister projects), then we expect the clickthrough rate to be higher in the two test groups compared to that of controls. Figure 5 shows that various search activity measures did not vary too much from one group to another.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">counts &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group, session_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">searches =</span> <span class="kw">length</span>(<span class="kw">unique</span>(serp_id)),
+            <span class="dt">SERPs =</span> <span class="kw">sum</span>(event <span class="op">==</span><span class="st"> &quot;SERP&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="st">`</span><span class="dt">searches</span><span class="ch">\n</span><span class="dt">per session</span><span class="st">`</span> =<span class="st"> </span><span class="kw">mean</span>(searches),
+            <span class="st">`</span><span class="dt">SERPs seen</span><span class="ch">\n</span><span class="dt"> per session</span><span class="st">`</span> =<span class="st"> </span><span class="kw">mean</span>(SERPs)) <span class="op">%&gt;%</span>
+<span class="st">  </span>ungroup <span class="op">%&gt;%</span>
+<span class="st">  </span>tidyr<span class="op">::</span><span class="kw">gather</span>(metric, value, <span class="op">-</span><span class="kw">c</span>(wiki, group))</code></pre></div>
+<div class="figure">
+<img src="index_files/figure-html/counts_plot-1.png" alt="**Figure 5**: Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user." width="\textwidth" />
+<p class="caption">
+<strong>Figure 5</strong>: Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user.
+</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">searches_H1 &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(
+    (group <span class="op">==</span><span class="st"> &quot;Control&quot;</span> <span class="op">&amp;</span><span class="st"> `</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>) <span class="op">|</span>
+<span class="st">      </span>(group <span class="op">==</span><span class="st"> &quot;Test&quot;</span> <span class="op">&amp;</span><span class="st"> `</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>)
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">right_join</span>(searches, <span class="dt">by =</span> <span class="st">&quot;serp_id&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">clickthrough =</span> <span class="kw">any</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">searches =</span> <span class="kw">n</span>(), <span class="dt">clickthroughs =</span> <span class="kw">sum</span>(clickthrough)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>clickthroughs, .<span class="op">$</span>searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))</code></pre></div>
+<div class="figure">
+<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group, only searches that yielded some same-wiki results were considered. In the two test groups, only searches that yielded some sister-wiki results were considered." width="\textwidth" />
+<p class="caption">
+<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group, only searches that yielded some same-wiki results were considered. In the two test groups, only searches that yielded some sister-wiki results were considered.
+</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bcda_H1 &lt;-<span class="st"> </span>searches_H1 <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Control&quot;</span>, <span class="st">&quot;Test&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(wiki, <span class="kw">desc</span>(group)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(BCDA<span class="op">::</span><span class="kw">tidy</span>(BCDA<span class="op">::</span><span class="kw">beta_binom</span>(.<span class="op">$</span>x, .<span class="op">$</span>n), <span class="dt">interval_type =</span> <span class="st">&quot;HPD&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span>ungroup</code></pre></div>
+<div class="figure">
+<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 7**: Comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group with the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group." width="\textwidth" />
+<p class="caption">
+<strong>Figure 7</strong>: Comparison of the <span class="test-group-1">Control</span> group with the <span class="test-group-2">Test</span> group.
+</p>
+</div>
+<?xml version="1.0" encoding="UTF-8"?>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<caption>
+<strong>Table 4</strong>: How much more likely the <span class="test-group-2">Test</span> group was to engage with the search results compared to the <span class="test-group-1">Control</span> group.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Wiki
+</th>
+<th style="text-align:left;">
+Relative Risk
+</th>
+<th style="text-align:left;">
+95% CI
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Arabic Wikipedia
+</td>
+<td style="text-align:left;">
+1.124
+</td>
+<td style="text-align:left;">
+(1.039, 1.212)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Catalan Wikipedia
+</td>
+<td style="text-align:left;">
+0.938
+</td>
+<td style="text-align:left;">
+(0.871, 1.002)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+French Wikipedia
+</td>
+<td style="text-align:left;">
+1.047
+</td>
+<td style="text-align:left;">
+(0.982, 1.112)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+German Wikipedia
+</td>
+<td style="text-align:left;">
+0.802
+</td>
+<td style="text-align:left;">
+(0.760, 0.845)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Italian Wikipedia
+</td>
+<td style="text-align:left;">
+0.906
+</td>
+<td style="text-align:left;">
+(0.859, 0.955)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Persian Wikipedia
+</td>
+<td style="text-align:left;">
+0.994
+</td>
+<td style="text-align:left;">
+(0.927, 1.057)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Polish Wikipedia
+</td>
+<td style="text-align:left;">
+0.994
+</td>
+<td style="text-align:left;">
+(0.934, 1.063)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Russian Wikipedia
+</td>
+<td style="text-align:left;">
+1.041
+</td>
+<td style="text-align:left;">
+(0.984, 1.103)
+</td>
+</tr>
+</tbody>
+</table>
+<!-- In Figures 6 and 7, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (30.5%) and Italian <span class="test-group-3">Test (Recall)</span> () groups.-->
+<p>Table 4 shows the <a href="https://en.wikipedia.org/wiki/Relative_risk">relative risk</a> – how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are 0.938 times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% <a href="https://en.wikipedia.org/wiki/Credible_interval">credible intervals</a> contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">indices_subset &lt;-<span class="st"> </span>indices <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(project <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;commons&quot;</span>, <span class="st">&quot;wikipedia&quot;</span>))) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(cirrus_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sisters =</span> <span class="kw">length</span>(<span class="kw">unique</span>(project[n_results <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>])))
+sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">!=</span><span class="st"> &quot;Control&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">inner_join</span>(indices_subset, <span class="dt">by =</span> <span class="st">&quot;cirrus_id&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(group, wiki, cirrus_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(
+    <span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> =<span class="st"> </span><span class="kw">sum</span>(event <span class="op">==</span><span class="st"> &quot;sister-project click&quot;</span>),
+    <span class="dt">sisters =</span> sisters[<span class="dv">1</span>]
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span>ungroup <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(
+    <span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">case_when</span>(
+      .<span class="op">$</span><span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">~</span><span class="st"> &quot;0&quot;</span>,
+      .<span class="op">$</span><span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;1&quot;</span>,
+      .<span class="op">$</span><span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;2+&quot;</span>
+    ),
+    <span class="dt">sisters =</span> dplyr<span class="op">::</span><span class="kw">case_when</span>(
+      .<span class="op">$</span>sisters <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">~</span><span class="st"> &quot;0&quot;</span>,
+      .<span class="op">$</span>sisters <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;1&quot;</span>,
+      .<span class="op">$</span>sisters <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;2&quot;</span>,
+      .<span class="op">$</span>sisters <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;3+&quot;</span>
+    )
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(<span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3+&quot;</span>) <span class="op">&amp;</span><span class="st"> </span>sisters <span class="op">==</span><span class="st"> &quot;0&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(<span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span>, sisters) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span>ungroup <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">xtabs</span>(n <span class="op">~</span><span class="st"> </span>sisters <span class="op">+</span><span class="st"> `</span><span class="dt">clicks (sister project)</span><span class="st">`</span>, <span class="dt">data =</span> .)</code></pre></div>
+<?xml version="1.0" encoding="UTF-8"?>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<caption>
+<strong>Table 5</strong>: A contingency table of searches by number of sister projects returned (rows) and number of clicks on those cross-wiki results (columns). For example, there were 61 searches where the users saw 2 sister projects in the sidebar and clicked only once on one of those cross-wiki results.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+0 cross-wiki clicks
+</th>
+<th style="text-align:right;">
+1 cross-wiki clicks
+</th>
+<th style="text-align:right;">
+2+ cross-wiki clicks
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+0 sister projects
+</td>
+<td style="text-align:right;">
+14200
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 sister projects
+</td>
+<td style="text-align:right;">
+5072
+</td>
+<td style="text-align:right;">
+93
+</td>
+<td style="text-align:right;">
+18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2 sister projects
+</td>
+<td style="text-align:right;">
+3669
+</td>
+<td style="text-align:right;">
+61
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3+ sister projects
+</td>
+<td style="text-align:right;">
+12269
+</td>
+<td style="text-align:right;">
+154
+</td>
+<td style="text-align:right;">
+32
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">BF &lt;-<span class="st"> </span>LearnBayes<span class="op">::</span><span class="kw">ctable</span>(sister_ctr, <span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">nrow</span>(sister_ctr)<span class="op">*</span><span class="kw">ncol</span>(sister_ctr)), <span class="kw">nrow</span>(sister_ctr)))
+BCCT.fit &lt;-<span class="st"> </span>sister_ctr <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">as.data.frame</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">set_colnames</span>(<span class="kw">c</span>(<span class="st">&quot;sisters&quot;</span>, <span class="st">&quot;clicks&quot;</span>, <span class="st">&quot;searches&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span>conting<span class="op">::</span><span class="kw">bcct</span>(searches <span class="op">~</span><span class="st"> </span>sisters <span class="op">+</span><span class="st"> </span>clicks <span class="op">+</span><span class="st"> </span>sisters<span class="op">:</span>clicks, <span class="dt">data =</span> .,
+                <span class="dt">n.sample =</span> <span class="fl">2e4</span>, <span class="dt">prior =</span> <span class="st">&quot;UIP&quot;</span>)
+BCCT.summary &lt;-<span class="st"> </span><span class="kw">summary</span>(BCCT.fit, <span class="dt">n.burnin =</span> <span class="fl">1e3</span>, <span class="dt">thin =</span> <span class="dv">5</span>)
+BCCT.estimates &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(BCCT.summary<span class="op">$</span>int_stats[<span class="kw">c</span>(<span class="st">&quot;term&quot;</span>, <span class="st">&quot;post_mean&quot;</span>, <span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)])
+BCCT.estimates <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;(Intercept)&quot;</span>, <span class="st">&quot;0 sister projects and 0 cross-wiki clicks&quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;:&quot;</span>, <span class="st">&quot; and &quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;sisters1&quot;</span>, <span class="st">&quot;1 sister project&quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;sisters2&quot;</span>, <span class="st">&quot;2 sister projects&quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;sisters3&quot;</span>, <span class="st">&quot;3+ sister projects&quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;clicks1&quot;</span>, <span class="st">&quot;1 cross-wiki click&quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">term =</span> <span class="kw">sub</span>(<span class="st">&quot;clicks2&quot;</span>, <span class="st">&quot;2+ cross-wiki clicks&quot;</span>, term, <span class="dt">fixed =</span> <span class="ot">TRUE</span>),
+    <span class="dt">ci =</span> <span class="kw">sprintf</span>(<span class="st">&quot;(%.2f, %.2f)&quot;</span>, lower, upper)
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">Coefficient =</span> term, <span class="dt">Estimate =</span> post_mean, <span class="st">`</span><span class="dt">95% HPDI</span><span class="st">`</span> =<span class="st"> </span>ci) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(lower, upper)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">fable</span>(<span class="kw">format_caption</span>(table_caps, <span class="st">&quot;Log-linear Model&quot;</span>))</code></pre></div>
+<?xml version="1.0" encoding="UTF-8"?>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<caption>
+<strong>Table 5</strong>: Results of fitting a Bayesian log-linear model to cross-wiki results and cross-wiki clickthroughs.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Coefficient
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:left;">
+95% HPDI
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+0 sister projects and 0 cross-wiki clicks
+</td>
+<td style="text-align:right;">
+4.768
+</td>
+<td style="text-align:left;">
+(4.44, 5.00)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 sister project
+</td>
+<td style="text-align:right;">
+-1.652
+</td>
+<td style="text-align:left;">
+(-2.61, -0.98)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2 sister projects
+</td>
+<td style="text-align:right;">
+0.535
+</td>
+<td style="text-align:left;">
+(0.26, 0.88)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3+ sister projects
+</td>
+<td style="text-align:right;">
+-0.082
+</td>
+<td style="text-align:left;">
+(-0.41, 0.29)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 cross-wiki click
+</td>
+<td style="text-align:right;">
+4.161
+</td>
+<td style="text-align:left;">
+(3.92, 4.48)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2+ cross-wiki clicks
+</td>
+<td style="text-align:right;">
+-1.745
+</td>
+<td style="text-align:left;">
+(-2.22, -1.26)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 sister project and 1 cross-wiki click
+</td>
+<td style="text-align:right;">
+2.285
+</td>
+<td style="text-align:left;">
+(1.61, 3.24)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2 sister projects and 1 cross-wiki click
+</td>
+<td style="text-align:right;">
+-0.933
+</td>
+<td style="text-align:left;">
+(-1.27, -0.65)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3+ sister projects and 1 cross-wiki click
+</td>
+<td style="text-align:right;">
+-0.640
+</td>
+<td style="text-align:left;">
+(-1.00, -0.31)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1 sister project and 2+ cross-wiki clicks
+</td>
+<td style="text-align:right;">
+-2.941
+</td>
+<td style="text-align:left;">
+(-4.48, -1.65)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2 sister projects and 2+ cross-wiki clicks
+</td>
+<td style="text-align:right;">
+0.966
+</td>
+<td style="text-align:left;">
+(0.43, 1.44)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3+ sister projects and 2+ cross-wiki clicks
+</td>
+<td style="text-align:right;">
+1.165
+</td>
+<td style="text-align:left;">
+(0.59, 1.73)
+</td>
+</tr>
+</tbody>
+</table>
+<p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian <em>p</em> value of 0.501 does <em>not</em> indicate that the interaction model is inadequate. Futhermore, Kass and Raftery <span class="citation">(<a href="#ref-Kass:1995vb">1995</a>)</span> suggest that <span class="math inline">\(2~\log_e(\mathrm{Bayes Factor}) = 290.28\)</span> is very strong evidence against null hypothesis of independence. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.</p>
+<p>Table 6 summarizes the MCMC results of fitting a Bayesian log-linear model to the data in Table 5. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasing the negative estimate for “3+ sister projects and 1 cross-wiki click” (-0.64) to the positive estimates for “2/3+ sister projects and 2+ cross-wiki clicks” (0.966 and 1.165, respectively), <em>the model suggests the relationship is <strong>positive</strong> – that more sister projects shown to the user yields more cross-wiki clicks, up to a point</em>.</p>
+</div>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+<p>We also suspect that the high zero results rate for each of the sister projects for these four languages may have been responsible for the few sister-project clicks. In Figure 8, relatively few searches had more than 3 cross-wiki search results. As shown in Table 6 in the <a href="#engagement">Engagement</a> analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">searches_subset &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">==</span><span class="st"> &quot;Test&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(event <span class="op">==</span><span class="st"> &quot;SERP&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(cirrus_id)
+crosswiki_results &lt;-<span class="st"> </span>searches_subset <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">inner_join</span>(indices_subset, <span class="dt">by =</span> <span class="st">&quot;cirrus_id&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(sisters) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>()</code></pre></div>
+<div class="figure">
+<img src="index_files/figure-html/crosswiki_results_plot-1.png" alt="**Figure 8**: How many of the two test groups' searches returned cross-wiki results from 0 (none) - 7 (all) sister projects." width="\textwidth" />
+<p class="caption">
+<strong>Figure 8</strong>: How many of the two test groups’ searches returned cross-wiki results from 0 (none) - 7 (all) sister projects.
+</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">single_clicks &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">!=</span><span class="st"> &quot;Control&quot;</span>, <span class="st">`</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>, <span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(
+    <span class="dt">clicks =</span> <span class="kw">sum</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>),
+    <span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> =<span class="st"> </span><span class="kw">sum</span>(event <span class="op">==</span><span class="st"> &quot;sister-project click&quot;</span>)
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(clicks <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(<span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">xtabs</span>(n <span class="op">~</span><span class="st"> `</span><span class="dt">clicks (sister project)</span><span class="st">`</span>, <span class="dt">data =</span> .)</code></pre></div>
+<p>Of the 394 unique searches that included a click on the cross-wiki results, 232 were searches where the user received both sets of results (same-wiki and cross-wiki) but clicked only once and specifically on a cross-wiki result. This suggests that for a lot of users the results from sister projects may have been more relevant than the results from the wiki they were on.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-R-learnbayes">
+<p>Albert, Jim. 2014. <em>LearnBayes: Functions for Learning Bayesian Inference</em>. <a href="https://CRAN.R-project.org/package=LearnBayes" class="uri">https://CRAN.R-project.org/package=LearnBayes</a>.</p>
+</div>
+<div id="ref-R-rmarkdown">
+<p>Allaire, JJ, Joe Cheng, Yihui Xie, Jonathan McPherson, Winston Chang, Jeff Allen, Hadley Wickham, Aron Atkins, Rob Hyndman, and Ruben Arslan. 2016. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+</div>
+<div id="ref-R-magrittr">
+<p>Bache, Stefan Milton, and Hadley Wickham. 2014. <em>Magrittr: A Forward-Pipe Operator for R</em>. <a href="https://CRAN.R-project.org/package=magrittr" class="uri">https://CRAN.R-project.org/package=magrittr</a>.</p>
+</div>
+<div id="ref-Prev-report">
+<p>Bernhardson, Erik, Jan Drewniak, Dan Garry, Mikhail Popov, and Deb Tankersley. 2017. <em>A Test of Cross-Wiki Search: Helping Users Discover Content on Wikipedia’s Sister Projects</em>. <a href="https://commons.wikimedia.org/wiki/File:A_Test_Of_Cross-wiki_Search_-_Helping_Users_Discover_Content_On_Wikipedia%E2%80%99s_Sister_Projects.pdf">https://commons.wikimedia.org/wiki/File:A_Test_Of_Cross-wiki_Search_-_Helping_Users_Discover_Content_On_Wikipedia%E2%80%99s_Sister_Projects.pdf</a>.</p>
+</div>
+<div id="ref-R-binom">
+<p>Dorai-Raj, Sundar. 2014. <em>Binom: Binomial Confidence Intervals for Several Parameterizations</em>. <a href="https://CRAN.R-project.org/package=binom" class="uri">https://CRAN.R-project.org/package=binom</a>.</p>
+</div>
+<div id="ref-Kass:1995vb">
+<p>Kass, R E, and Adrian E Raftery. 1995. “Bayes factors.” <em>Journal of the American Statistical Association</em>.</p>
+</div>
+<div id="ref-R-wmf">
+<p>Keyes, Oliver, and Mikhail Popov. 2017. <em>Wmf: R Code for Wikimedia Foundation Internal Usage</em>. <a href="https://phabricator.wikimedia.org/diffusion/1821/" class="uri">https://phabricator.wikimedia.org/diffusion/1821/</a>.</p>
+</div>
+<div id="ref-R-conting">
+<p>Overstall, Antony M. 2016. <em>Conting: Bayesian Analysis of Contingency Tables</em>. <a href="https://CRAN.R-project.org/package=conting" class="uri">https://CRAN.R-project.org/package=conting</a>.</p>
+</div>
+<div id="ref-R-BCDA">
+<p>Popov, Mikhail. n.d. <em>BCDA: Tools for Bayesian Categorical Data Analysis</em>. <a href="https://github.com/bearloga/BCDA" class="uri">https://github.com/bearloga/BCDA</a>.</p>
+</div>
+<div id="ref-R-base">
+<p>R Core Team. 2016. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="uri">https://www.R-project.org/</a>.</p>
+</div>
+<div id="ref-R-ggplot2">
+<p>Wickham, Hadley. 2009. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="http://ggplot2.org" class="uri">http://ggplot2.org</a>.</p>
+</div>
+<div id="ref-R-tidyr">
+<p>———. 2017. <em>Tidyr: Easily Tidy Data with ’Spread()’ and ’Gather()’ Functions</em>. <a href="https://CRAN.R-project.org/package=tidyr" class="uri">https://CRAN.R-project.org/package=tidyr</a>.</p>
+</div>
+<div id="ref-R-dplyr">
+<p>Wickham, Hadley, and Romain Francois. 2016. <em>Dplyr: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr" class="uri">https://CRAN.R-project.org/package=dplyr</a>.</p>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://commons.wikimedia.org/wiki/File:Sister_Projects_search_results_second_test_screen_sample.png">Screenshot by Deb Tankersley</a> available on <a href="https://commons.wikimedia.org/wiki/Main_Page">Wikimedia Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Relative traffic was calculated using a combination of <a href="https://query.wikidata.org/">Wikidata Query Service (WDQS)</a> and <a href="https://www.mediawiki.org/wiki/Analytics">Wikimedia Analytics</a>’ <a href="https://wikitech.wikimedia.org/wiki/Analytics/Unique_Devices">monthly unique devices API</a>. See <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar-2/blame/master/Workbook.Rmd">the workbook</a> for implementation.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>The languages Wikipedia is available in were counted by querying <a href="https://www.wikidata.org/wiki/Q52">Wikidata</a> with <a href="https://query.wikidata.org/#PREFIX%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX%20schema%3A%20%3Chttp%3A%2F%2Fschema.org%2F%3E%0ASELECT%20%28COUNT%20%28DISTINCT%20%3Fsitelink%29%20AS%20%3Flanguages%29%0AWHERE%20%7B%0A%20%20BIND%28wd%3AQ52%20AS%20%3Fwikipedia%29%0A%20%20%3Fsitelink%20schema%3Aabout%20%3Fwikipedia%20.%0A%20%20FILTER%20regex%28str%28%3Fsitelink%29%2C%20%22.wikipedia.org%2Fwiki%2F%22%29%20.%0A%7D">this SPARQL query</a>.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>To see the sampling configuration, refer to <a href="https://gerrit.wikimedia.org/r/#/c/343104">Gerrit change 343104</a>.<a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+
+<div id="wmf" title="By Wikimedia Foundation (Wikimedia Foundation) [CC BY-SA 3.0 (http://creativecommons.org/licenses/by-sa/3.0)], via Wikimedia Commons"></div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://tools-static.wmflabs.org/cdnjs/ajax/libs/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

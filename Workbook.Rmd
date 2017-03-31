@@ -1,0 +1,105 @@
+---
+title: "Scratch"
+output: 
+  html_notebook: 
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup}
+library(magrittr)
+import::from(dplyr, group_by, ungroup, keep_where = filter, mutate, arrange, select, transmute, left_join, summarize, bind_rows, case_when, if_else, rename)
+library(ggplot2)
+```
+
+```{r wikis, eval=FALSE}
+wikipedia_urls <- WikidataQueryServiceR::query_wikidata("PREFIX schema: <http://schema.org/>
+SELECT ?sitelink
+WHERE {
+	BIND(wd:Q52 AS ?wikipedia)
+  ?sitelink schema:about ?wikipedia .
+  FILTER regex(str(?sitelink), \".wikipedia.org/wiki/\") .
+}")
+wikis <- sub("^https?://(.*\\.wikipedia).org/wiki/.*", "\\1", wikipedia_urls$sitelink)
+pb <- progress::progress_bar$new(total = length(wikis))
+fetch_unique_devices <- function(wiki, date = Sys.Date() - months(1)) {
+  pb$tick()
+  result <- httr::GET(
+  url = sprintf("https://wikimedia.org/api/rest_v1/metrics/unique-devices/%s/desktop-site/monthly/%s/%s",
+                wiki, format(lubridate::floor_date(date, unit = "months"), "%Y%m%d"), format(date, "%Y%m%d")),
+  httr::user_agent("mpopov@wikimedia.org")
+)
+  item <- jsonlite::fromJSON(httr::content(result, as = "text"), simplifyVector = FALSE)$items[[1]]
+  return(data.frame(
+    project = item$project,
+    devices = item$devices,
+    stringsAsFactors = FALSE
+  ))
+}
+monthly_unique_devices <- purrr::map_df(wikis, fetch_unique_devices)
+monthly_unique_devices$lang <- dplyr::case_when(
+  monthly_unique_devices$project == "pl.wikipedia" ~ "Polish",
+  monthly_unique_devices$project == "ca.wikipedia" ~ "Catalan",
+  monthly_unique_devices$project == "fa.wikipedia" ~ "Persian",
+  monthly_unique_devices$project == "it.wikipedia" ~ "Italian",
+  monthly_unique_devices$project == "ru.wikipedia" ~ "Russian",
+  monthly_unique_devices$project == "de.wikipedia" ~ "German",
+  monthly_unique_devices$project == "fr.wikipedia" ~ "French",
+  monthly_unique_devices$project == "ar.wikipedia" ~ "Arabic",
+  TRUE ~ "Others"
+)
+monthly_unique_devices %>%
+  dplyr::group_by(lang) %>%
+  dplyr::summarize(devices = sum(devices)) %>%
+  dplyr::mutate(prop = round(devices/sum(devices), 3),
+                `percentage` = sprintf("~%.2f%%", 100 * devices/sum(devices)))
+```
+
+```{r data}
+if (!dir.exists("data")) {
+  dir.create("data")
+}
+if (!file.exists("data/T160008-searches.tsv.gz")) {
+  system("scp notebook1001.eqiad.wmnet:/home/bearloga/data/T160008-searches.tsv.gz data/")
+}
+
+searches <- readr::read_tsv("data/T160008-searches.tsv.gz", col_types = readr::cols(
+  date = readr::col_date(format = ""),
+  group = readr::col_character(),
+  wiki = readr::col_character(),
+  session_id = readr::col_character(),
+  timestamp = readr::col_datetime(format = ""),
+  event_id = readr::col_character(),
+  page_id = readr::col_character(),
+  query_hash = readr::col_character(),
+  event = readr::col_character(),
+  `clicked-result position` = readr::col_double(),
+  `some same-wiki results` = readr::col_logical(),
+  n_results = readr::col_double(),
+  load_time = readr::col_double(),
+  search_token = readr::col_character(),
+  serp_id = readr::col_character(),
+  cirrus_id = readr::col_character(),
+  `sister project` = readr::col_character(),
+  destination = readr::col_character(),
+  `cirrus log: same-wiki results` = readr::col_integer(),
+  `cirrus log: some same-wiki results` = readr::col_logical(),
+  `cirrus log: sister-wiki results` = readr::col_integer(),
+  `cirrus log: some sister-wiki results` = readr::col_logical()
+))
+
+if (!file.exists("data/T156300-indices.tsv.gz")) {
+  system("scp notebook1001.eqiad.wmnet:/home/bearloga/data/T160008-indices.tsv.gz data/")
+}
+
+indices <- readr::read_tsv("data/T160008-indices.tsv.gz", col_types = readr::cols(
+  cirrus_id = readr::col_character(),
+  project = readr::col_character(),
+  n_results = readr::col_integer()
+))
+```
+
+```{r}
+save(list = c("searches", "indices"), file = "data/T160008.RData")
+```
