@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2017-03-31" />
+<meta name="date" content="2017-04-04" />
 
 <title>Second Test Of Cross-wiki Search</title>
 
@@ -292,7 +292,7 @@ Product Manager (Search Backend), Wikimedia Foundation<br><h4 class="author"><em
 <address class="author_afil">
 Data Analyst, Wikimedia Foundation<br><h4 class="author"><em>Deb Tankersley</em></h4>
 <address class="author_afil">
-Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>31 March 2017</em></h4>
+Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>04 April 2017</em></h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 …
@@ -581,11 +581,11 @@ x &lt;-<span class="st"> </span><span class="kw">plot</span>(visitor_flow, <span
 </p>
 </div>
 <p>We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result’s page.</p>
-<p>See Phabricator ticket <a href="https://phabricator.wikimedia.org/T149806">T149806</a> and Gerrit changes , and <a href="https://gerrit.wikimedia.org/r/#/c/343104">343104</a> for full details of the implementation on both back-end and front-end.</p>
+<p>See Phabricator ticket <a href="https://phabricator.wikimedia.org/T160004">T160004</a> and Gerrit changes , and <a href="https://gerrit.wikimedia.org/r/#/c/343104">343104</a> for full details of the implementation on both back-end and front-end.</p>
 </div>
 <div id="analysis" class="section level2">
 <h2>Analysis</h2>
-<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 9, 10, and 7.</p>
+<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 9, 10, and 8.</p>
 </div>
 </div>
 <div id="results" class="section level1">
@@ -885,16 +885,35 @@ All 2 groups
 <span class="st">      </span>(group <span class="op">==</span><span class="st"> &quot;Test&quot;</span> <span class="op">&amp;</span><span class="st"> `</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>)
   ) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(serp_id) <span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">right_join</span>(searches, <span class="dt">by =</span> <span class="st">&quot;serp_id&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(searches, <span class="dt">by =</span> <span class="st">&quot;serp_id&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">clickthrough =</span> <span class="kw">any</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">searches =</span> <span class="kw">n</span>(), <span class="dt">clickthroughs =</span> <span class="kw">sum</span>(clickthrough)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(wiki, group) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>clickthroughs, .<span class="op">$</span>searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))
+searches_H2 &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(
+    <span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span> <span class="op">&amp;</span>
+<span class="st">      `</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>
+  ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(searches, <span class="dt">by =</span> <span class="st">&quot;serp_id&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">clickthrough =</span> <span class="kw">any</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">searches =</span> <span class="kw">n</span>(), <span class="dt">clickthroughs =</span> <span class="kw">sum</span>(clickthrough)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group) <span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>clickthroughs, .<span class="op">$</span>searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group, only searches that yielded some same-wiki results were considered. In the two test groups, only searches that yielded some sister-wiki results were considered." width="\textwidth" />
+<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group, only searches that yielded some same-wiki results were considered. In the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group, only searches that yielded some sister-wiki results were considered." width="\textwidth" />
 <p class="caption">
-<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group, only searches that yielded some same-wiki results were considered. In the two test groups, only searches that yielded some sister-wiki results were considered.
+<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class="test-group-2">Test</span> group, only searches that yielded some sister-wiki results were considered.
+</p>
+</div>
+<div class="figure">
+<img src="index_files/figure-html/hypothesis_2_plot-1.png" alt="**Figure 7**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group, only searches that yielded some same-wiki results were considered. In the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group..." width="\textwidth" />
+<p class="caption">
+<strong>Figure 7</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class="test-group-2">Test</span> group…
 </p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bcda_H1 &lt;-<span class="st"> </span>searches_H1 <span class="op">%&gt;%</span>
@@ -904,15 +923,15 @@ All 2 groups
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(BCDA<span class="op">::</span><span class="kw">tidy</span>(BCDA<span class="op">::</span><span class="kw">beta_binom</span>(.<span class="op">$</span>x, .<span class="op">$</span>n), <span class="dt">interval_type =</span> <span class="st">&quot;HPD&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span>ungroup</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 7**: Comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group with the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group." width="\textwidth" />
+<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 8**: Comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group with the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group." width="\textwidth" />
 <p class="caption">
-<strong>Figure 7</strong>: Comparison of the <span class="test-group-1">Control</span> group with the <span class="test-group-2">Test</span> group.
+<strong>Figure 8</strong>: Comparison of the <span class="test-group-1">Control</span> group with the <span class="test-group-2">Test</span> group.
 </p>
 </div>
 <?xml version="1.0" encoding="UTF-8"?>
 <table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
 <caption>
-<strong>Table 4</strong>: How much more likely the <span class="test-group-2">Test</span> group was to engage with the search results compared to the <span class="test-group-1">Control</span> group.
+<strong>Table 4</strong>: How much more likely the <span class="test-group-2">Test</span> group was to engage with the search results compared to the <span class="test-group-1">Control</span> group. A relative risk greater than 1 indicates the test group was more likely to engage, while a relative risk less than 1 indicates the test group was less likely to engage.
 </caption>
 <thead>
 <tr>
@@ -933,10 +952,10 @@ Relative Risk
 Arabic Wikipedia
 </td>
 <td style="text-align:left;">
-1.124
+1.107
 </td>
 <td style="text-align:left;">
-(1.039, 1.212)
+(1.020, 1.195)
 </td>
 </tr>
 <tr>
@@ -944,10 +963,10 @@ Arabic Wikipedia
 Catalan Wikipedia
 </td>
 <td style="text-align:left;">
-0.938
+0.987
 </td>
 <td style="text-align:left;">
-(0.871, 1.002)
+(0.915, 1.063)
 </td>
 </tr>
 <tr>
@@ -955,10 +974,10 @@ Catalan Wikipedia
 French Wikipedia
 </td>
 <td style="text-align:left;">
-1.047
+1.029
 </td>
 <td style="text-align:left;">
-(0.982, 1.112)
+(0.963, 1.093)
 </td>
 </tr>
 <tr>
@@ -966,10 +985,10 @@ French Wikipedia
 German Wikipedia
 </td>
 <td style="text-align:left;">
-0.802
+0.767
 </td>
 <td style="text-align:left;">
-(0.760, 0.845)
+(0.726, 0.812)
 </td>
 </tr>
 <tr>
@@ -977,10 +996,10 @@ German Wikipedia
 Italian Wikipedia
 </td>
 <td style="text-align:left;">
-0.906
+0.941
 </td>
 <td style="text-align:left;">
-(0.859, 0.955)
+(0.887, 0.990)
 </td>
 </tr>
 <tr>
@@ -988,10 +1007,10 @@ Italian Wikipedia
 Persian Wikipedia
 </td>
 <td style="text-align:left;">
-0.994
+0.939
 </td>
 <td style="text-align:left;">
-(0.927, 1.057)
+(0.872, 1.005)
 </td>
 </tr>
 <tr>
@@ -999,10 +1018,10 @@ Persian Wikipedia
 Polish Wikipedia
 </td>
 <td style="text-align:left;">
-0.994
+1.039
 </td>
 <td style="text-align:left;">
-(0.934, 1.063)
+(0.971, 1.113)
 </td>
 </tr>
 <tr>
@@ -1010,16 +1029,16 @@ Polish Wikipedia
 Russian Wikipedia
 </td>
 <td style="text-align:left;">
-1.041
+1.078
 </td>
 <td style="text-align:left;">
-(0.984, 1.103)
+(1.019, 1.143)
 </td>
 </tr>
 </tbody>
 </table>
-<!-- In Figures 6 and 7, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (30.5%) and Italian <span class="test-group-3">Test (Recall)</span> () groups.-->
-<p>Table 4 shows the <a href="https://en.wikipedia.org/wiki/Relative_risk">relative risk</a> – how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are 0.938 times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% <a href="https://en.wikipedia.org/wiki/Credible_interval">credible intervals</a> contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.</p>
+<!-- In Figures 6 and 8, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (41.7%) and Italian <span class="test-group-3">Test (Recall)</span> () groups.-->
+<p>Table 4 shows the <a href="https://en.wikipedia.org/wiki/Relative_risk">relative risk</a> – how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are 0.987 times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% <a href="https://en.wikipedia.org/wiki/Credible_interval">credible intervals</a> contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">indices_subset &lt;-<span class="st"> </span>indices <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(project <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;commons&quot;</span>, <span class="st">&quot;wikipedia&quot;</span>))) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cirrus_id) <span class="op">%&gt;%</span>
@@ -1155,7 +1174,7 @@ BCCT.estimates <span class="op">%&gt;%</span>
 <?xml version="1.0" encoding="UTF-8"?>
 <table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
 <caption>
-<strong>Table 5</strong>: Results of fitting a Bayesian log-linear model to cross-wiki results and cross-wiki clickthroughs.
+<strong>Table 6</strong>: Results of fitting a Bayesian log-linear model to cross-wiki results and cross-wiki clickthroughs.
 </caption>
 <thead>
 <tr>
@@ -1307,25 +1326,6 @@ Estimate
 </table>
 <p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian <em>p</em> value of 0.501 does <em>not</em> indicate that the interaction model is inadequate. Futhermore, Kass and Raftery <span class="citation">(<a href="#ref-Kass:1995vb">1995</a>)</span> suggest that <span class="math inline">\(2~\log_e(\mathrm{Bayes Factor}) = 290.28\)</span> is very strong evidence against null hypothesis of independence. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.</p>
 <p>Table 6 summarizes the MCMC results of fitting a Bayesian log-linear model to the data in Table 5. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasing the negative estimate for “3+ sister projects and 1 cross-wiki click” (-0.64) to the positive estimates for “2/3+ sister projects and 2+ cross-wiki clicks” (0.966 and 1.165, respectively), <em>the model suggests the relationship is <strong>positive</strong> – that more sister projects shown to the user yields more cross-wiki clicks, up to a point</em>.</p>
-</div>
-</div>
-<div id="discussion" class="section level1">
-<h1>Discussion</h1>
-<p>We also suspect that the high zero results rate for each of the sister projects for these four languages may have been responsible for the few sister-project clicks. In Figure 8, relatively few searches had more than 3 cross-wiki search results. As shown in Table 6 in the <a href="#engagement">Engagement</a> analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">searches_subset &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">==</span><span class="st"> &quot;Test&quot;</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">keep_where</span>(event <span class="op">==</span><span class="st"> &quot;SERP&quot;</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(cirrus_id)
-crosswiki_results &lt;-<span class="st"> </span>searches_subset <span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">inner_join</span>(indices_subset, <span class="dt">by =</span> <span class="st">&quot;cirrus_id&quot;</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(sisters) <span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>()</code></pre></div>
-<div class="figure">
-<img src="index_files/figure-html/crosswiki_results_plot-1.png" alt="**Figure 8**: How many of the two test groups' searches returned cross-wiki results from 0 (none) - 7 (all) sister projects." width="\textwidth" />
-<p class="caption">
-<strong>Figure 8</strong>: How many of the two test groups’ searches returned cross-wiki results from 0 (none) - 7 (all) sister projects.
-</p>
-</div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">single_clicks &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">!=</span><span class="st"> &quot;Control&quot;</span>, <span class="st">`</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>, <span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
@@ -1338,6 +1338,11 @@ crosswiki_results &lt;-<span class="st"> </span>searches_subset <span class="op"
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">xtabs</span>(n <span class="op">~</span><span class="st"> `</span><span class="dt">clicks (sister project)</span><span class="st">`</span>, <span class="dt">data =</span> .)</code></pre></div>
 <p>Of the 394 unique searches that included a click on the cross-wiki results, 232 were searches where the user received both sets of results (same-wiki and cross-wiki) but clicked only once and specifically on a cross-wiki result. This suggests that for a lot of users the results from sister projects may have been more relevant than the results from the wiki they were on.</p>
+</div>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+<p>We also suspect that the high zero results rate for each of the sister projects for these four languages may have been responsible for the few sister-project clicks. As shown in Table 6 in the <a href="#engagement">Engagement</a> analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>

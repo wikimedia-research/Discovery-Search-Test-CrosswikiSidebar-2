@@ -161,10 +161,10 @@ table_caps(name = "Click Counts", caption = "Number of click events by group.")
 figure_caps(name = "ZRR", caption = "Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results).")
 figure_caps(name = "ZRR by language", caption = "The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.")
 figure_caps(name = "Counts", caption = "Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user.")
-figure_caps(name = "Clickthrough Rates", caption = ifelse(is_html(), "Clickthrough rates of experimental groups, split by wiki. In the <span class=\"test-group-1\">Control</span> group, only searches that yielded some same-wiki results were considered. In the two test groups, only searches that yielded some sister-wiki results were considered.", "Clickthrough rates of experimental groups, split by wiki. In the Control group, only searches that yielded some same-wiki results were considered. In the two test groups, only searches that yielded some sister-wiki results were considered."))
+figure_caps(name = "Clickthrough Rates (1)", caption = ifelse(is_html(), "Clickthrough rates of experimental groups, split by wiki. In the <span class=\"test-group-1\">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class=\"test-group-2\">Test</span> group, only searches that yielded some sister-wiki results were considered.", "Clickthrough rates of experimental groups, split by wiki. In the Control group, only searches that yielded some same-wiki results were considered. In the Test group, only searches that yielded some sister-wiki results were considered."))
+figure_caps(name = "Clickthrough Rates (2)", caption = ifelse(is_html(), "Clickthrough rates of experimental groups, split by wiki. In the <span class=\"test-group-1\">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class=\"test-group-2\">Test</span> group...", "Clickthrough rates of experimental groups, split by wiki. In the Control group, only searches that yielded some same-wiki results were considered. In the Test group..."))
 figure_caps(name = "BCDA H1", caption = ifelse(is_html(), "Comparison of the <span class=\"test-group-1\">Control</span> group with the <span class=\"test-group-2\">Test</span> group.", "Comparison of the Control group with the Test group."))
-table_caps(name = "BCDA H1", caption = ifelse(is_html(), "How much more likely the <span class=\"test-group-2\">Test</span> group was to engage with the search results compared to the <span class=\"test-group-1\">Control</span> group.", "How much more likely the Test group was to engage with the search results compared to the Control group."))
-figure_caps(name = "Cross-wiki Results", caption = "How many of the two test groups' searches returned cross-wiki results from 0 (none) - 7 (all) sister projects.")
+table_caps(name = "BCDA H1", caption = paste(ifelse(is_html(), "How much more likely the <span class=\"test-group-2\">Test</span> group was to engage with the search results compared to the <span class=\"test-group-1\">Control</span> group.", "How much more likely the Test group was to engage with the search results compared to the Control group."), "A relative risk greater than 1 indicates the test group was more likely to engage, while a relative risk less than 1 indicates the test group was less likely to engage."))
 table_caps(name = "Sister Clicks", caption = "A contingency table of searches by number of sister projects returned (rows) and number of clicks on those cross-wiki results (columns). For example, there were 61 searches where the users saw 2 sister projects in the sidebar and clicked only once on one of those cross-wiki results.")
 table_caps(name = "Log-linear Model", caption = "Results of fitting a Bayesian log-linear model to cross-wiki results and cross-wiki clickthroughs.")
 ```
@@ -176,7 +176,7 @@ if (is_html()) {
 }
 ```
 ```{r data, cache=TRUE, include=FALSE}
-load(path("data/T160008.RData")) # loads 'searches' and 'indices'
+load(path("data/T160008.RData")) # loads 'searches' & 'indices'
 ```
 # Introduction
 
@@ -354,7 +354,7 @@ x <- plot(visitor_flow, node_margin = 3, default_style = ds, fix.pdf = TRUE)
 
 We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result's page.
 
-See Phabricator ticket [T149806](https://phabricator.wikimedia.org/T149806) and Gerrit changes , and [343104](https://gerrit.wikimedia.org/r/#/c/343104) for full details of the implementation on both back-end and front-end.
+See Phabricator ticket [T160004](https://phabricator.wikimedia.org/T160004) and Gerrit changes , and [343104](https://gerrit.wikimedia.org/r/#/c/343104) for full details of the implementation on both back-end and front-end.
 
 ## Analysis
 
@@ -543,7 +543,7 @@ ggplot(counts, aes(x = 1, y = value, color = group, ymin = 0, ymax = value)) +
        subtitle = "A single search can result in multiple SERPs if the user navigates to other pages of results or clicks a result and then goes back")
 ```
 
-```{r hypothesis_1_data}
+```{r hypotheses_data}
 searches_H1 <- searches %>%
   group_by(serp_id) %>%
   keep_where(
@@ -551,17 +551,33 @@ searches_H1 <- searches %>%
       (group == "Test" & `cirrus log: some sister-wiki results`)
   ) %>%
   select(serp_id) %>%
-  dplyr::right_join(searches, by = "serp_id") %>%
+  dplyr::left_join(searches, by = "serp_id") %>%
+  group_by(wiki, group, serp_id) %>%
+  summarize(clickthrough = any(event != "SERP")) %>%
+  summarize(searches = n(), clickthroughs = sum(clickthrough)) %>%
+  group_by(wiki, group) %>%
+  dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
+searches_H2 <- searches %>%
+  group_by(serp_id) %>%
+  keep_where(
+    `cirrus log: some same-wiki results` &
+      `cirrus log: some sister-wiki results`
+  ) %>%
+  select(serp_id) %>%
+  dplyr::left_join(searches, by = "serp_id") %>%
   group_by(wiki, group, serp_id) %>%
   summarize(clickthrough = any(event != "SERP")) %>%
   summarize(searches = n(), clickthroughs = sum(clickthrough)) %>%
   group_by(wiki, group) %>%
   dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
 ```
-```{r hypothesis_1_caption, include=FALSE}
-hypothesis_1_cap <- format_caption(figure_caps, "Clickthrough Rates")
+```{r hypotheses_captions, include=FALSE}
+hypotheses_cap <- list(
+  ctr_1 = format_caption(figure_caps, "Clickthrough Rates (1)"),
+  ctr_2 = format_caption(figure_caps, "Clickthrough Rates (2)")
+)
 ```
-```{r hypothesis_1_plot, echo=FALSE, fig.cap=hypothesis_1_cap}
+```{r hypothesis_1_plot, echo=FALSE, fig.cap=hypotheses_cap$ctr_1}
 searches_H1 %>%
   ggplot(aes(x = 1, color = group, y = mean, ymin = lower, ymax = upper)) +
   geom_hline(aes(yintercept = mean), linetype = "dashed", color = RColorBrewer::brewer.pal(3, "Set1")[1],
@@ -583,6 +599,29 @@ searches_H1 %>%
   labs(x = NULL, title = "Clickthrough rates of experimental groups across wikis",
        subtitle = "Each point estimate includes a 95% credible interval",
        caption = "* For this engagement analysis we focused on: (1) controls' searches with same-wiki results, and (2) test groups' searches that included sister-wiki results.")
+```
+```{r hypothesis_2_plot, echo=FALSE, fig.cap=hypotheses_cap$ctr_2}
+searches_H2 %>%
+  ggplot(aes(x = 1, color = group, y = mean, ymin = lower, ymax = upper)) +
+  geom_hline(aes(yintercept = mean), linetype = "dashed", color = RColorBrewer::brewer.pal(3, "Set1")[1],
+             data = keep_where(searches_H2, group == "Control")) +
+  geom_pointrange(position = position_dodge(width = 0.5)) +
+  geom_text(aes(label = sprintf("%.1f%%", 100 * mean), y = upper + 0.0025, vjust = "bottom"),
+            position = position_dodge(width = 0.5)) +
+  facet_wrap(~ wiki, nrow = 1) +
+  scale_color_brewer("Group", palette = "Set1") +
+  scale_y_continuous("Clickthrough Rate", labels = scales::percent_format()) +
+  theme_minimal(base_family = "GillSans") +
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        strip.background = element_rect(fill = "gray90"),
+        panel.border = element_rect(color = "gray30", fill = NA)) +
+  labs(x = NULL, title = "Clickthrough rates of experimental groups across wikis",
+       subtitle = "Each point estimate includes a 95% credible interval",
+       caption = "* For this engagement analysis we focused on searches which yielded both sets of results, even if the user did not necessarily see both.")
 ```
 
 ```{r bcda_H1_data}
@@ -639,7 +678,7 @@ bcda_H1 %>%
   fable(format_caption(table_caps, "BCDA H1"))
 ```
 
-<!-- In Figures `r figure_caps("Clickthrough Rates", display = "num")` and `r figure_caps("BCDA H1", display = "num")`, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (`r sprintf("%.1f%%", 100 * keep_where(searches_H1, wiki == "Polish Wikipedia", group == "Test")$mean)`) and Italian <span class="test-group-3">Test (Recall)</span> (`r sprintf("%.1f%%", 100 * keep_where(searches_H1, wiki == "Italian Wikipedia", group == "Test (Recall)")$mean)`) groups.-->
+<!-- In Figures `r figure_caps("Clickthrough Rates (1)", display = "num")` and `r figure_caps("BCDA H1", display = "num")`, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (`r sprintf("%.1f%%", 100 * keep_where(searches_H1, wiki == "Polish Wikipedia", group == "Test")$mean)`) and Italian <span class="test-group-3">Test (Recall)</span> (`r sprintf("%.1f%%", 100 * keep_where(searches_H1, wiki == "Italian Wikipedia", group == "Test (Recall)")$mean)`) groups.-->
 
 `r table_caps("BCDA H1", display = "cite")` shows the [relative risk](https://en.wikipedia.org/wiki/Relative_risk) -- how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are `r sprintf("%.3f", keep_where(bcda_H1, wiki == "Catalan Wikipedia", term == "relative_risk")$estimate)` times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% [credible intervals](https://en.wikipedia.org/wiki/Credible_interval) contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.
 
@@ -711,39 +750,6 @@ Under the $\chi^2$ discrepancy statistic, the Bayesian *p* value of `r BCCT.summ
 
 `r table_caps("Log-linear Model", display = "cite")` summarizes the MCMC results of fitting a Bayesian log-linear model to the data in `r table_caps("Sister Clicks", display = "cite")`. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasing the negative estimate for "3+ sister projects and 1 cross-wiki click" (`r BCCT.estimates$post_mean[9]`) to the positive estimates for "2/3+ sister projects and 2+ cross-wiki clicks" (`r BCCT.estimates$post_mean[11]` and `r BCCT.estimates$post_mean[12]`, respectively), _the model suggests the relationship is **positive** -- that more sister projects shown to the user yields more cross-wiki clicks, up to a point_.
 
-# Discussion
-
-We also suspect that the high zero results rate for each of the sister projects for these four languages may have been responsible for the few sister-project clicks. In `r figure_caps("Cross-wiki Results", display = "cite")`, relatively few searches had more than 3 cross-wiki search results. As shown in `r table_caps("Log-linear Model", display = "cite")` in the [Engagement] analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.
-
-```{r crosswiki_results_data}
-searches_subset <- searches %>%
-  keep_where(group == "Test") %>%
-  keep_where(event == "SERP") %>%
-  dplyr::distinct(cirrus_id)
-crosswiki_results <- searches_subset %>%
-  dplyr::inner_join(indices_subset, by = "cirrus_id") %>%
-  group_by(sisters) %>%
-  dplyr::count()
-```
-```{r crosswiki_results_caption, include=FALSE}
-crosswiki_results_cap <- format_caption(figure_caps, "Cross-wiki Results")
-```
-```{r crosswiki_results_plot, echo=FALSE, fig.cap=crosswiki_results_cap}
-ggplot(crosswiki_results, aes(x = sisters, y = n)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = polloi::compress(n, 2), vjust = "bottom"),
-            nudge_y = 100) +
-  scale_y_continuous(labels = polloi::compress, breaks = seq(0, 14.5e3, 1e3)) +
-  scale_x_continuous(breaks = 0:7) +
-  theme_minimal(base_family = "GillSans") +
-  theme(legend.position = "bottom",
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        strip.background = element_rect(fill = "gray90")) +
-  labs(x = "Number of sister projects displayed in the sidebar",
-       y = "Searches", title = "Number of test group's searches by number of cross-wiki results returned")
-```
-
 ```{r single_clicks}
 single_clicks <- searches %>%
   keep_where(group != "Control", `cirrus log: some sister-wiki results`, `cirrus log: some same-wiki results`) %>%
@@ -759,6 +765,10 @@ single_clicks <- searches %>%
 ```
 
 Of the `r length(unique(searches$serp_id[searches$event == "sister-project click"]))` unique searches that included a click on the cross-wiki results, `r single_clicks[2]` were searches where the user received both sets of results (same-wiki and cross-wiki) but clicked only once and specifically on a cross-wiki result. This suggests that for a lot of users the results from sister projects may have been more relevant than the results from the wiki they were on.
+
+# Discussion
+
+We also suspect that the high zero results rate for each of the sister projects for these four languages may have been responsible for the few sister-project clicks. As shown in `r table_caps("Log-linear Model", display = "cite")` in the [Engagement] analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.
 
 ```{r bibliograpby, results='asis', echo=FALSE}
 if (is_html()) {
