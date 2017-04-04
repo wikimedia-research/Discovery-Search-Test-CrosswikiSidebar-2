@@ -161,8 +161,7 @@ table_caps(name = "Click Counts", caption = "Number of click events by group.")
 figure_caps(name = "ZRR", caption = "Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results).")
 figure_caps(name = "ZRR by language", caption = "The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.")
 figure_caps(name = "Counts", caption = "Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user.")
-figure_caps(name = "Clickthrough Rates (1)", caption = ifelse(is_html(), "Clickthrough rates of experimental groups, split by wiki. In the <span class=\"test-group-1\">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class=\"test-group-2\">Test</span> group, only searches that yielded some sister-wiki results were considered.", "Clickthrough rates of experimental groups, split by wiki. In the Control group, only searches that yielded some same-wiki results were considered. In the Test group, only searches that yielded some sister-wiki results were considered."))
-figure_caps(name = "Clickthrough Rates (2)", caption = ifelse(is_html(), "Clickthrough rates of experimental groups, split by wiki. In the <span class=\"test-group-1\">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class=\"test-group-2\">Test</span> group...", "Clickthrough rates of experimental groups, split by wiki. In the Control group, only searches that yielded some same-wiki results were considered. In the Test group..."))
+figure_caps(name = "Clickthrough Rates", caption = ifelse(is_html(), "Clickthrough rates of experimental groups, split by wiki. In the <span class=\"test-group-1\">Control</span> group...", "Clickthrough rates of experimental groups, split by wiki. In the Control group..."))
 figure_caps(name = "BCDA H1", caption = ifelse(is_html(), "Comparison of the <span class=\"test-group-1\">Control</span> group with the <span class=\"test-group-2\">Test</span> group.", "Comparison of the Control group with the Test group."))
 table_caps(name = "BCDA H1", caption = paste(ifelse(is_html(), "How much more likely the <span class=\"test-group-2\">Test</span> group was to engage with the search results compared to the <span class=\"test-group-1\">Control</span> group.", "How much more likely the Test group was to engage with the search results compared to the Control group."), "A relative risk greater than 1 indicates the test group was more likely to engage, while a relative risk less than 1 indicates the test group was less likely to engage."))
 table_caps(name = "Sister Clicks", caption = "A contingency table of searches by number of sister projects returned (rows) and number of clicks on those cross-wiki results (columns). For example, there were 61 searches where the users saw 2 sister projects in the sidebar and clicked only once on one of those cross-wiki results.")
@@ -543,27 +542,17 @@ ggplot(counts, aes(x = 1, y = value, color = group, ymin = 0, ymax = value)) +
        subtitle = "A single search can result in multiple SERPs if the user navigates to other pages of results or clicks a result and then goes back")
 ```
 
-```{r hypotheses_data}
+```{r hypothesis_1_data}
 searches_H1 <- searches %>%
-  group_by(serp_id) %>%
-  keep_where(
-    (group == "Control" & `cirrus log: some same-wiki results`) |
-      (group == "Test" & `cirrus log: some sister-wiki results`)
-  ) %>%
-  select(serp_id) %>%
-  dplyr::left_join(searches, by = "serp_id") %>%
-  group_by(wiki, group, serp_id) %>%
-  summarize(clickthrough = any(event != "SERP")) %>%
-  summarize(searches = n(), clickthroughs = sum(clickthrough)) %>%
-  group_by(wiki, group) %>%
-  dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
-searches_H2 <- searches %>%
   group_by(serp_id) %>%
   keep_where(
     `cirrus log: some same-wiki results` &
       `cirrus log: some sister-wiki results`
   ) %>%
   select(serp_id) %>%
+  ungroup %>%
+  arrange(serp_id) %>%
+  dplyr::distinct() %>%
   dplyr::left_join(searches, by = "serp_id") %>%
   group_by(wiki, group, serp_id) %>%
   summarize(clickthrough = any(event != "SERP")) %>%
@@ -571,13 +560,10 @@ searches_H2 <- searches %>%
   group_by(wiki, group) %>%
   dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
 ```
-```{r hypotheses_captions, include=FALSE}
-hypotheses_cap <- list(
-  ctr_1 = format_caption(figure_caps, "Clickthrough Rates (1)"),
-  ctr_2 = format_caption(figure_caps, "Clickthrough Rates (2)")
-)
+```{r hypothesis_1_caption, include=FALSE}
+hypothesis_1_cap <- format_caption(figure_caps, "Clickthrough Rates")
 ```
-```{r hypothesis_1_plot, echo=FALSE, fig.cap=hypotheses_cap$ctr_1}
+```{r hypothesis_1_plot, echo=FALSE, fig.cap=hypothesis_1_cap}
 searches_H1 %>%
   ggplot(aes(x = 1, color = group, y = mean, ymin = lower, ymax = upper)) +
   geom_hline(aes(yintercept = mean), linetype = "dashed", color = RColorBrewer::brewer.pal(3, "Set1")[1],
@@ -596,37 +582,13 @@ searches_H1 %>%
         axis.text.x = element_blank(),
         strip.background = element_rect(fill = "gray90"),
         panel.border = element_rect(color = "gray30", fill = NA)) +
-  labs(x = NULL, title = "Clickthrough rates of experimental groups across wikis",
+  labs(x = NULL, title = "Search-wise clickthrough rates of experimental groups across wikis",
        subtitle = "Each point estimate includes a 95% credible interval",
-       caption = "* For this engagement analysis we focused on: (1) controls' searches with same-wiki results, and (2) test groups' searches that included sister-wiki results.")
-```
-```{r hypothesis_2_plot, echo=FALSE, fig.cap=hypotheses_cap$ctr_2}
-searches_H2 %>%
-  ggplot(aes(x = 1, color = group, y = mean, ymin = lower, ymax = upper)) +
-  geom_hline(aes(yintercept = mean), linetype = "dashed", color = RColorBrewer::brewer.pal(3, "Set1")[1],
-             data = keep_where(searches_H2, group == "Control")) +
-  geom_pointrange(position = position_dodge(width = 0.5)) +
-  geom_text(aes(label = sprintf("%.1f%%", 100 * mean), y = upper + 0.0025, vjust = "bottom"),
-            position = position_dodge(width = 0.5)) +
-  facet_wrap(~ wiki, nrow = 1) +
-  scale_color_brewer("Group", palette = "Set1") +
-  scale_y_continuous("Clickthrough Rate", labels = scales::percent_format()) +
-  theme_minimal(base_family = "GillSans") +
-  theme(legend.position = "bottom",
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.x = element_blank(),
-        strip.background = element_rect(fill = "gray90"),
-        panel.border = element_rect(color = "gray30", fill = NA)) +
-  labs(x = NULL, title = "Clickthrough rates of experimental groups across wikis",
-       subtitle = "Each point estimate includes a 95% credible interval",
-       caption = "* For this engagement analysis we focused on searches which yielded both sets of results, even if the user did not necessarily see both.")
+       caption = "* For this engagement analysis we focused on searches that yielded same-wiki and cross-wiki results, even if the end user did not necessarily get to see them.")
 ```
 
 ```{r bcda_H1_data}
 bcda_H1 <- searches_H1 %>%
-  keep_where(group %in% c("Control", "Test")) %>%
   arrange(wiki, desc(group)) %>%
   group_by(wiki) %>%
   dplyr::do(BCDA::tidy(BCDA::beta_binom(.$x, .$n), interval_type = "HPD")) %>%
@@ -662,7 +624,6 @@ bcda_H1 %>%
         strip.text.y = element_text(size = 12, angle = 0)) +
   labs(x = NULL, y = "Estimate",
        title = "How likely Test users were to engage with search results",
-       subtitle = "Only including controls' searches with same-wiki results and test groups' searches with sister-wiki results",
        caption = "* 95% credible intervals calculated as Highest Posterior Density (HPD) intervals")
 ```
 
@@ -678,7 +639,7 @@ bcda_H1 %>%
   fable(format_caption(table_caps, "BCDA H1"))
 ```
 
-<!-- In Figures `r figure_caps("Clickthrough Rates (1)", display = "num")` and `r figure_caps("BCDA H1", display = "num")`, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (`r sprintf("%.1f%%", 100 * keep_where(searches_H1, wiki == "Polish Wikipedia", group == "Test")$mean)`) and Italian <span class="test-group-3">Test (Recall)</span> (`r sprintf("%.1f%%", 100 * keep_where(searches_H1, wiki == "Italian Wikipedia", group == "Test (Recall)")$mean)`) groups.-->
+In Figures `r figure_caps("Clickthrough Rates", display = "num")` and `r figure_caps("BCDA H1", display = "num")`, we see that engagement was higher in <span class="test-group-2">Test</span> than in <span class="test-group-1">Control</span> on 4 of the 8 wikis (Arabic, French, Polish, and Russian Wikipedias) but lower on the other 4 (Italian, Persian, barely Catalan, and most drastically German Wikipedias).
 
 `r table_caps("BCDA H1", display = "cite")` shows the [relative risk](https://en.wikipedia.org/wiki/Relative_risk) -- how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are `r sprintf("%.3f", keep_where(bcda_H1, wiki == "Catalan Wikipedia", term == "relative_risk")$estimate)` times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% [credible intervals](https://en.wikipedia.org/wiki/Credible_interval) contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.
 

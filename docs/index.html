@@ -585,7 +585,7 @@ x &lt;-<span class="st"> </span><span class="kw">plot</span>(visitor_flow, <span
 </div>
 <div id="analysis" class="section level2">
 <h2>Analysis</h2>
-<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 9, 10, and 8.</p>
+<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 8, 9, and 7.</p>
 </div>
 </div>
 <div id="results" class="section level1">
@@ -830,7 +830,7 @@ All 2 groups
 </table>
 <div id="zero-results-rate-zrr" class="section level2">
 <h2>Zero Results Rate (ZRR)</h2>
-<p>The zero results rate (ZRR) – proportion of searches yielding zero results – is one of Discovery’s Search Team’s key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results’ relevance). While we were primarily interested in searchers’ engagement with the search result for this test, we included this section as a consistency check – that the zero results rate is lower when a cross-wiki search is performed (see Figure 9).</p>
+<p>The zero results rate (ZRR) – proportion of searches yielding zero results – is one of Discovery’s Search Team’s key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results’ relevance). While we were primarily interested in searchers’ engagement with the search result for this test, we included this section as a consistency check – that the zero results rate is lower when a cross-wiki search is performed (see Figure 8).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">zrr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(
@@ -881,23 +881,13 @@ All 2 groups
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">searches_H1 &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">keep_where</span>(
-    (group <span class="op">==</span><span class="st"> &quot;Control&quot;</span> <span class="op">&amp;</span><span class="st"> `</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>) <span class="op">|</span>
-<span class="st">      </span>(group <span class="op">==</span><span class="st"> &quot;Test&quot;</span> <span class="op">&amp;</span><span class="st"> `</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>)
-  ) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(serp_id) <span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(searches, <span class="dt">by =</span> <span class="st">&quot;serp_id&quot;</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">clickthrough =</span> <span class="kw">any</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">searches =</span> <span class="kw">n</span>(), <span class="dt">clickthroughs =</span> <span class="kw">sum</span>(clickthrough)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(wiki, group) <span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>clickthroughs, .<span class="op">$</span>searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))
-searches_H2 &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">keep_where</span>(
     <span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span> <span class="op">&amp;</span>
 <span class="st">      `</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>
   ) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span>ungroup <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(serp_id) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">distinct</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(searches, <span class="dt">by =</span> <span class="st">&quot;serp_id&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">clickthrough =</span> <span class="kw">any</span>(event <span class="op">!=</span><span class="st"> &quot;SERP&quot;</span>)) <span class="op">%&gt;%</span>
@@ -905,27 +895,20 @@ searches_H2 &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group) <span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>clickthroughs, .<span class="op">$</span>searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group, only searches that yielded some same-wiki results were considered. In the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group, only searches that yielded some sister-wiki results were considered." width="\textwidth" />
+<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group..." width="\textwidth" />
 <p class="caption">
-<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class="test-group-2">Test</span> group, only searches that yielded some sister-wiki results were considered.
-</p>
-</div>
-<div class="figure">
-<img src="index_files/figure-html/hypothesis_2_plot-1.png" alt="**Figure 7**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group, only searches that yielded some same-wiki results were considered. In the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group..." width="\textwidth" />
-<p class="caption">
-<strong>Figure 7</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group, only searches that yielded some same-wiki results were considered. In the <span class="test-group-2">Test</span> group…
+<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group…
 </p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bcda_H1 &lt;-<span class="st"> </span>searches_H1 <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Control&quot;</span>, <span class="st">&quot;Test&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">arrange</span>(wiki, <span class="kw">desc</span>(group)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki) <span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(BCDA<span class="op">::</span><span class="kw">tidy</span>(BCDA<span class="op">::</span><span class="kw">beta_binom</span>(.<span class="op">$</span>x, .<span class="op">$</span>n), <span class="dt">interval_type =</span> <span class="st">&quot;HPD&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span>ungroup</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 8**: Comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group with the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group." width="\textwidth" />
+<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 7**: Comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group with the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group." width="\textwidth" />
 <p class="caption">
-<strong>Figure 8</strong>: Comparison of the <span class="test-group-1">Control</span> group with the <span class="test-group-2">Test</span> group.
+<strong>Figure 7</strong>: Comparison of the <span class="test-group-1">Control</span> group with the <span class="test-group-2">Test</span> group.
 </p>
 </div>
 <?xml version="1.0" encoding="UTF-8"?>
@@ -952,10 +935,10 @@ Relative Risk
 Arabic Wikipedia
 </td>
 <td style="text-align:left;">
-1.107
+1.078
 </td>
 <td style="text-align:left;">
-(1.020, 1.195)
+(0.989, 1.169)
 </td>
 </tr>
 <tr>
@@ -963,10 +946,10 @@ Arabic Wikipedia
 Catalan Wikipedia
 </td>
 <td style="text-align:left;">
-0.987
+0.952
 </td>
 <td style="text-align:left;">
-(0.915, 1.063)
+(0.875, 1.027)
 </td>
 </tr>
 <tr>
@@ -974,10 +957,10 @@ Catalan Wikipedia
 French Wikipedia
 </td>
 <td style="text-align:left;">
-1.029
+1.020
 </td>
 <td style="text-align:left;">
-(0.963, 1.093)
+(0.954, 1.089)
 </td>
 </tr>
 <tr>
@@ -985,10 +968,10 @@ French Wikipedia
 German Wikipedia
 </td>
 <td style="text-align:left;">
-0.767
+0.854
 </td>
 <td style="text-align:left;">
-(0.726, 0.812)
+(0.800, 0.907)
 </td>
 </tr>
 <tr>
@@ -996,10 +979,10 @@ German Wikipedia
 Italian Wikipedia
 </td>
 <td style="text-align:left;">
-0.941
+0.921
 </td>
 <td style="text-align:left;">
-(0.887, 0.990)
+(0.869, 0.974)
 </td>
 </tr>
 <tr>
@@ -1007,10 +990,10 @@ Italian Wikipedia
 Persian Wikipedia
 </td>
 <td style="text-align:left;">
-0.939
+1.020
 </td>
 <td style="text-align:left;">
-(0.872, 1.005)
+(0.938, 1.106)
 </td>
 </tr>
 <tr>
@@ -1018,10 +1001,10 @@ Persian Wikipedia
 Polish Wikipedia
 </td>
 <td style="text-align:left;">
-1.039
+1.025
 </td>
 <td style="text-align:left;">
-(0.971, 1.113)
+(0.951, 1.104)
 </td>
 </tr>
 <tr>
@@ -1029,16 +1012,16 @@ Polish Wikipedia
 Russian Wikipedia
 </td>
 <td style="text-align:left;">
-1.078
+1.021
 </td>
 <td style="text-align:left;">
-(1.019, 1.143)
+(0.959, 1.083)
 </td>
 </tr>
 </tbody>
 </table>
-<!-- In Figures 6 and 8, we see that the clickthrough rate was higher in <span class="test-group-2">Test</span> and <span class="test-group-3">Test (Recall)</span> than in <span class="test-group-1">Control</span> on almost all of the four wikis. The only exception being the clickthrough rates of users in the Polish Wikipedia <span class="test-group-2">Test</span> (41.7%) and Italian <span class="test-group-3">Test (Recall)</span> () groups.-->
-<p>Table 4 shows the <a href="https://en.wikipedia.org/wiki/Relative_risk">relative risk</a> – how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are 0.987 times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% <a href="https://en.wikipedia.org/wiki/Credible_interval">credible intervals</a> contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.</p>
+<p>In Figures 6 and 7, we see that engagement was higher in <span class="test-group-2">Test</span> than in <span class="test-group-1">Control</span> on 4 of the 8 wikis (Arabic, French, Polish, and Russian Wikipedias) but lower on the other 4 (Italian, Persian, barely Catalan, and most drastically German Wikipedias).</p>
+<p>Table 4 shows the <a href="https://en.wikipedia.org/wiki/Relative_risk">relative risk</a> – how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are 0.952 times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% <a href="https://en.wikipedia.org/wiki/Credible_interval">credible intervals</a> contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">indices_subset &lt;-<span class="st"> </span>indices <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(project <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;commons&quot;</span>, <span class="st">&quot;wikipedia&quot;</span>))) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cirrus_id) <span class="op">%&gt;%</span>
