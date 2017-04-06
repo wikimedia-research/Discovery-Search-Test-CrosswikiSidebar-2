@@ -103,3 +103,15 @@ indices <- readr::read_tsv("data/T160008-indices.tsv.gz", col_types = readr::col
 ```{r}
 save(list = c("searches", "indices"), file = "data/T160008.RData")
 ```
+
+```{r}
+searches %>%
+  group_by(query_hash) %>%
+  summarize(
+    sessions = length(unique(session_id))
+  ) %>%
+  keep_where(sessions > 1) %>%
+  dplyr::left_join(searches, by = "query_hash") %>%
+  arrange(query_hash, wiki, group, event_id) %>%
+  View()
+```

@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2017-04-04" />
+<meta name="date" content="2017-04-06" />
 
 <title>Second Test Of Cross-wiki Search</title>
 
@@ -292,7 +292,7 @@ Product Manager (Search Backend), Wikimedia Foundation<br><h4 class="author"><em
 <address class="author_afil">
 Data Analyst, Wikimedia Foundation<br><h4 class="author"><em>Deb Tankersley</em></h4>
 <address class="author_afil">
-Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>04 April 2017</em></h4>
+Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>06 April 2017</em></h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 …
@@ -895,9 +895,9 @@ All 2 groups
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group) <span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(binom<span class="op">::</span><span class="kw">binom.bayes</span>(.<span class="op">$</span>clickthroughs, .<span class="op">$</span>searches, <span class="dt">conf.level =</span> <span class="fl">0.95</span>))</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki. In the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group..." width="\textwidth" />
+<img src="index_files/figure-html/hypothesis_1_plot-1.png" alt="**Figure 6**: Clickthrough rates of experimental groups, split by wiki." width="\textwidth" />
 <p class="caption">
-<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki. In the <span class="test-group-1">Control</span> group…
+<strong>Figure 6</strong>: Clickthrough rates of experimental groups, split by wiki.
 </p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bcda_H1 &lt;-<span class="st"> </span>searches_H1 <span class="op">%&gt;%</span>
@@ -906,9 +906,9 @@ All 2 groups
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">do</span>(BCDA<span class="op">::</span><span class="kw">tidy</span>(BCDA<span class="op">::</span><span class="kw">beta_binom</span>(.<span class="op">$</span>x, .<span class="op">$</span>n), <span class="dt">interval_type =</span> <span class="st">&quot;HPD&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span>ungroup</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 7**: Comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group with the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group." width="\textwidth" />
+<img src="index_files/figure-html/bcda_H1_plot-1.png" alt="**Figure 7**: By-wiki comparison of the &lt;span class=&quot;test-group-1&quot;&gt;Control&lt;/span&gt; group's probability of engaging with results to the &lt;span class=&quot;test-group-2&quot;&gt;Test&lt;/span&gt; group's probability." width="\textwidth" />
 <p class="caption">
-<strong>Figure 7</strong>: Comparison of the <span class="test-group-1">Control</span> group with the <span class="test-group-2">Test</span> group.
+<strong>Figure 7</strong>: By-wiki comparison of the <span class="test-group-1">Control</span> group’s probability of engaging with results to the <span class="test-group-2">Test</span> group’s probability.
 </p>
 </div>
 <?xml version="1.0" encoding="UTF-8"?>
