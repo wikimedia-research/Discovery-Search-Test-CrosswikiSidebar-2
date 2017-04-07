@@ -175,9 +175,9 @@ table_caps(name = "Log-linear Model", caption = "Results of fitting a Bayesian l
 ```
 ```{r links, echo=FALSE, results='asis'}
 if (is_html()) {
-  cat('<p>{ <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar/blob/master/docs/index.Rmd">RMarkdown Source</a> | <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar">Analysis Codebase</a> }</p>')
+  cat('<p>{ <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar-2/blob/master/docs/index.Rmd">RMarkdown Source</a> | <a href="https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar-2">Analysis Codebase</a> }</p>')
 } else {
-  cat('\\let\\thefootnote\\relax\\footnote{Source code and data are available on GitHub (\\href{https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar}{wikimedia-research/Discovery-Search-Test-CrosswikiSidebar})}')
+  cat('\\let\\thefootnote\\relax\\footnote{Source code and data are available on GitHub (\\href{https://github.com/wikimedia-research/Discovery-Search-Test-CrosswikiSidebar-2}{wikimedia-research/Discovery-Search-Test-CrosswikiSidebar-2})}')
 }
 ```
 ```{r data, cache=TRUE, include=FALSE}
