@@ -358,13 +358,11 @@ visitor_flow <- riverplot::makeRiver(
 x <- plot(visitor_flow, node_margin = 3, default_style = ds, fix.pdf = TRUE)
 ```
 
-We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result's page.
-
-See Phabricator ticket [T160004](https://phabricator.wikimedia.org/T160004) and Gerrit changes , and [343104](https://gerrit.wikimedia.org/r/#/c/343104) for full details of the implementation on both back-end and front-end.
+We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result's page. See Phabricator ticket [T160004](https://phabricator.wikimedia.org/T160004) for full details of the implementation on both back-end and front-end.
 
 ## Analysis
 
-We employed the *binom* [@R-binom], *LearnBayes* [@R-learnbayes], *conting* [@R-conting], and internally-developed *BCDA* [@R-BCDA] packages for Bayesian statistical analysis and confidence intervals in Figures `r figure_caps("zero_results_rate", display = "num")`, `r figure_caps("clickthrough_rates", display = "num")`, and `r figure_caps("BCDA H1", display = "num")`.
+We employed the *binom* [@R-binom], *LearnBayes* [@R-learnbayes], *conting* [@R-conting], and internally-developed *BCDA* [@R-BCDA] packages for Bayesian statistical analysis and confidence intervals in Figures `r figure_caps("ZRR", display = "num")`, `r figure_caps("Clickthrough Rates (1)", display = "num")`,  `r figure_caps("Clickthrough Rates (2)", display = "num")`, and `r figure_caps("BCDA H1", display = "num")`.
 
 # Results
 

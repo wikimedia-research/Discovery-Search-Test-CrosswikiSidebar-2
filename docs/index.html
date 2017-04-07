@@ -580,12 +580,11 @@ x &lt;-<span class="st"> </span><span class="kw">plot</span>(visitor_flow, <span
 <strong>Figure 2</strong>: Flow of Wikipedia visitors into the A/B test.
 </p>
 </div>
-<p>We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result’s page.</p>
-<p>See Phabricator ticket <a href="https://phabricator.wikimedia.org/T160004">T160004</a> and Gerrit changes , and <a href="https://gerrit.wikimedia.org/r/#/c/343104">343104</a> for full details of the implementation on both back-end and front-end.</p>
+<p>We would like to note that our event logging does not support cross-wiki tracking, so after the user leaves the search results page, we cannot tell whether they have performed subsequent searches, nor how or how long the user engaged with the visited result’s page. See Phabricator ticket <a href="https://phabricator.wikimedia.org/T160004">T160004</a> for full details of the implementation on both back-end and front-end.</p>
 </div>
 <div id="analysis" class="section level2">
 <h2>Analysis</h2>
-<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 9, 10, and 8.</p>
+<p>We employed the <em>binom</em> <span class="citation">(Dorai-Raj <a href="#ref-R-binom">2014</a>)</span>, <em>LearnBayes</em> <span class="citation">(Albert <a href="#ref-R-learnbayes">2014</a>)</span>, <em>conting</em> <span class="citation">(Overstall <a href="#ref-R-conting">2016</a>)</span>, and internally-developed <em>BCDA</em> <span class="citation">(Popov, n.d.)</span> packages for Bayesian statistical analysis and confidence intervals in Figures 3, 6, 7, and 8.</p>
 </div>
 </div>
 <div id="results" class="section level1">
