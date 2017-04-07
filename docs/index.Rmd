@@ -13,7 +13,12 @@ author:
   name: "Mikhail Popov"
 - affiliation: "Product Manager (Analysis, Search Frontend), Wikimedia Foundation"
   name: "Deb Tankersley"
-abstract: "..."
+abstract: >
+  Discovery's Frontend and Backend Search teams ran an A/B test from 17 March 2017 to 27 March 2017 to assess the effectiveness of performing cross-wiki searches and showing results from sister projects (such as Wikisource and Wikiquote) to randomly selected users on Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias. We found that relatively few users clicked on the cross-wiki results and that overall engagement varied greatly across the wikis.
+  
+  For example, while Test group users were more likely to engage with results than the Control group on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis' recommendation is to move forward with the cross-wiki search project.
+  
+  That is, there does not appear to be overwhelming evidence that we should *not* continue with the cross-wiki search project, and we are left to wonder if -- perhaps -- there are cultural differences in tasks/intent at play here, but this would require considerable human-computer interaction research.
 output:
   html_document:
     includes:
@@ -161,7 +166,8 @@ table_caps(name = "Click Counts", caption = "Number of click events by group.")
 figure_caps(name = "ZRR", caption = "Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results).")
 figure_caps(name = "ZRR by language", caption = "The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.")
 figure_caps(name = "Counts", caption = "Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user.")
-figure_caps(name = "Clickthrough Rates", caption = "Clickthrough rates of experimental groups, split by wiki.")
+figure_caps(name = "Clickthrough Rates (1)", caption = "Clickthrough rates of experimental groups, split by wiki.")
+figure_caps(name = "Clickthrough Rates (2)", caption = "Day-by-day clickthrough rates of experimental groups, split by wiki.")
 figure_caps(name = "BCDA H1", caption = ifelse(is_html(), "By-wiki comparison of the <span class=\"test-group-1\">Control</span> group's probability of engaging with results to the <span class=\"test-group-2\">Test</span> group's probability.", "Comparison of the Control group's probability of engaging with results to the Test group's probability."))
 table_caps(name = "BCDA H1", caption = paste(ifelse(is_html(), "How much more likely the <span class=\"test-group-2\">Test</span> group was to engage with the search results compared to the <span class=\"test-group-1\">Control</span> group.", "How much more likely the Test group was to engage with the search results compared to the Control group."), "A relative risk greater than 1 indicates the test group was more likely to engage, while a relative risk less than 1 indicates the test group was less likely to engage."))
 table_caps(name = "Sister Clicks", caption = "A contingency table of searches by number of sister projects returned (rows) and number of clicks on those cross-wiki results (columns). For example, there were 61 searches where the users saw 2 sister projects in the sidebar and clicked only once on one of those cross-wiki results.")
@@ -176,6 +182,7 @@ if (is_html()) {
 ```
 ```{r data, cache=TRUE, include=FALSE}
 load(path("data/T160008.RData")) # loads 'searches' & 'indices'
+searches <- dplyr::filter(searches, date < "2017-03-28") # last day of data is incomplete and exhibits too much deviation
 ```
 # Introduction
 
@@ -542,7 +549,7 @@ ggplot(counts, aes(x = 1, y = value, color = group, ymin = 0, ymax = value)) +
        subtitle = "A single search can result in multiple SERPs if the user navigates to other pages of results or clicks a result and then goes back")
 ```
 
-```{r hypothesis_1_data}
+```{r hypotheses_data}
 searches_H1 <- searches %>%
   group_by(serp_id) %>%
   keep_where(
@@ -559,11 +566,27 @@ searches_H1 <- searches %>%
   summarize(searches = n(), clickthroughs = sum(clickthrough)) %>%
   group_by(wiki, group) %>%
   dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
+searches_H2 <- searches %>%
+  group_by(serp_id) %>%
+  keep_where(
+    `cirrus log: some same-wiki results` &
+      `cirrus log: some sister-wiki results`
+  ) %>%
+  select(serp_id) %>%
+  ungroup %>%
+  arrange(serp_id) %>%
+  dplyr::distinct() %>%
+  dplyr::left_join(searches, by = "serp_id") %>%
+  group_by(date, wiki, group, serp_id) %>%
+  summarize(clickthrough = any(event != "SERP")) %>%
+  summarize(searches = n(), clickthroughs = sum(clickthrough)) %>%
+  group_by(date, wiki, group) %>%
+  dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
 ```
-```{r hypothesis_1_caption, include=FALSE}
-hypothesis_1_cap <- format_caption(figure_caps, "Clickthrough Rates")
+```{r hypotheses_caption, include=FALSE}
+hypotheses_cap <- c(format_caption(figure_caps, "Clickthrough Rates (1)"), format_caption(figure_caps, "Clickthrough Rates (2)"))
 ```
-```{r hypothesis_1_plot, echo=FALSE, fig.cap=hypothesis_1_cap}
+```{r hypothesis_1_plot, echo=FALSE, fig.cap=hypotheses_cap[1]}
 searches_H1 %>%
   ggplot(aes(x = 1, color = group, y = mean, ymin = lower, ymax = upper)) +
   geom_hline(aes(yintercept = mean), linetype = "dashed", color = RColorBrewer::brewer.pal(3, "Set1")[1],
@@ -584,6 +607,28 @@ searches_H1 %>%
         panel.border = element_rect(color = "gray30", fill = NA)) +
   labs(x = NULL, title = "Search-wise clickthrough rates of experimental groups across wikis",
        subtitle = "Each point estimate includes a 95% credible interval",
+       caption = "* For this engagement analysis we focused on searches that yielded same-wiki and cross-wiki results, even if the end user did not necessarily get to see them.")
+```
+```{r hypothesis_2_plot, echo=FALSE, fig.cap=hypotheses_cap[2]}
+searches_H2 %>%
+  ggplot(aes(x = date, color = group, y = mean, ymin = lower, ymax = upper)) +
+  geom_hline(data = searches_H1, aes(yintercept = mean, color = group), linetype = "dashed") +
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = group), alpha = 0.1, color = NA) +
+  geom_line() +
+  facet_wrap(~ wiki, nrow = 1) +
+  scale_color_brewer("Group", palette = "Set1") +
+  scale_fill_brewer("Group", palette = "Set1") +
+  scale_y_continuous("Clickthrough Rate", labels = scales::percent_format()) +
+  theme_minimal(base_family = "GillSans") +
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        strip.background = element_rect(fill = "gray90"),
+        panel.border = element_rect(color = "gray30", fill = NA)) +
+  labs(x = NULL, title = "Daily search-wise clickthrough rates of experimental groups across wikis",
+       subtitle = paste("Dashed lines mark the overall clickthrough rate from", figure_caps("Clickthrough Rates (1)", display = "cite")),
        caption = "* For this engagement analysis we focused on searches that yielded same-wiki and cross-wiki results, even if the end user did not necessarily get to see them.")
 ```
 
@@ -639,7 +684,7 @@ bcda_H1 %>%
   fable(format_caption(table_caps, "BCDA H1"))
 ```
 
-In Figures `r figure_caps("Clickthrough Rates", display = "num")` and `r figure_caps("BCDA H1", display = "num")`, we see that engagement was higher in <span class="test-group-2">Test</span> than in <span class="test-group-1">Control</span> on 4 of the 8 wikis (Arabic, French, Polish, and Russian Wikipedias) but lower on the other 4 (Italian, Persian, barely Catalan, and most drastically German Wikipedias).
+In Figures `r figure_caps("Clickthrough Rates (1)", display = "num")`, `r figure_caps("Clickthrough Rates (2)", display = "num")`, and `r figure_caps("BCDA H1", display = "num")`, we see that engagement was higher in <span class="test-group-2">Test</span> than in <span class="test-group-1">Control</span> on 5 of the 8 wikis (Arabic, French, Persian, Polish, and Russian Wikipedias) but lower on the other 4 (Italian, Catalan, and most drastically German Wikipedias).
 
 `r table_caps("BCDA H1", display = "cite")` shows the [relative risk](https://en.wikipedia.org/wiki/Relative_risk) -- how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are `r sprintf("%.3f", keep_where(bcda_H1, wiki == "Catalan Wikipedia", term == "relative_risk")$estimate)` times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% [credible intervals](https://en.wikipedia.org/wiki/Credible_interval) contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.
 
@@ -725,7 +770,7 @@ single_clicks <- searches %>%
   xtabs(n ~ `clicks (sister project)`, data = .)
 ```
 
-Of the `r length(unique(searches$serp_id[searches$event == "sister-project click"]))` unique searches that included a click on the cross-wiki results, `r single_clicks[2]` were searches where the user received both sets of results (same-wiki and cross-wiki) but clicked only once and specifically on a cross-wiki result. This suggests that for a lot of users the results from sister projects may have been more relevant than the results from the wiki they were on.
+Of the `r length(unique(searches$serp_id[searches$event == "sister-project click"]))` unique searches that included a click on the cross-wiki results, `r single_clicks[2]` were searches where the user received both sets of results (same-wiki and cross-wiki) but clicked only once and specifically on a cross-wiki result. This suggests that for some users the results from sister projects may have been more relevant than the results from the wiki they were on.
 
 # Discussion
 
