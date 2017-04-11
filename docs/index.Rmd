@@ -165,7 +165,7 @@ table_caps(name = "Session Counts", caption = "Number of search sessions used fo
 table_caps(name = "Click Counts", caption = "Number of click events by group.")
 figure_caps(name = "ZRR", caption = "Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results).")
 figure_caps(name = "ZRR by language", caption = "The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.")
-figure_caps(name = "Counts", caption = "Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user.")
+figure_caps(name = "Counts", caption = "Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the two groups had very similar average searches per user.")
 figure_caps(name = "Clickthrough Rates (1)", caption = "Clickthrough rates of experimental groups, split by wiki.")
 figure_caps(name = "Clickthrough Rates (2)", caption = "Day-by-day clickthrough rates of experimental groups, split by wiki.")
 figure_caps(name = "BCDA H1", caption = ifelse(is_html(), "By-wiki comparison of the <span class=\"test-group-1\">Control</span> group's probability of engaging with results to the <span class=\"test-group-2\">Test</span> group's probability.", "Comparison of the Control group's probability of engaging with results to the Test group's probability."))
@@ -188,7 +188,7 @@ searches <- dplyr::filter(searches, date < "2017-03-28") # last day of data is i
 
 Within the [Wikimedia Foundation](https://wikimediafoundation.org/wiki/Home)'s [Engineering group](https://www.mediawiki.org/wiki/Wikimedia_Engineering), the [Discovery department](https://www.mediawiki.org/wiki/Wikimedia_Discovery)'s mission is to make the wealth of knowledge and content in the [Wikimedia projects](https://wikimediafoundation.org/wiki/Our_projects) (such as [Wikipedia](https://www.wikipedia.org/)) easily discoverable. The Search team is responsible for maintaining and enhancing the search features and APIs for MediaWiki, such as language detection -- i.e. if a French Wikipedia visitor searches and gets fewer than 3 results, we check if maybe their query is in another language, and if our language detection determines that the query's language is most likely German (for example), then in addition to results from French Wikipedia, they would also get results from German Wikipedia, if any.
 
-Specifically, the [Search team](https://www.mediawiki.org/wiki/Wikimedia_Discovery/Search)'s current goal is to add cross-wiki searching -- that is, providing search results from other (also referred to as "sister") Wikimedia projects ("*wikis*") within the same language. For example, if a work (e.g. a book or poem) on French Wikisource matched the user's query, that user would be shown results from French Wikisource in addition to any results from French Wikipedia. In our previous report [-@Prev-report], we showed that there was some evidence that suggested thsee additional "cross-wiki" search results helped user engagement but due to some issues with the user interface the results were not definitive, and so this test was meant to be a follow-up for us after we corrected those issues.
+Specifically, the [Search team](https://www.mediawiki.org/wiki/Wikimedia_Discovery/Search)'s current goal is to add cross-wiki searching -- that is, providing search results from other (also referred to as "sister") Wikimedia projects ("*wikis*") within the same language. For example, if a work (e.g. a book or poem) on French Wikisource matched the user's query, that user would be shown results from French Wikisource in addition to any results from French Wikipedia. In our previous report [-@Prev-report], we showed that there was some evidence that suggested these additional "cross-wiki" search results helped user engagement but due to some issues with the user interface the results were not definitive, and so this test was meant to be a follow-up for us after we corrected those issues.
 
 ```{r example_caption, include=FALSE}
 example_cap <- format_caption(figure_caps, "Example")
@@ -199,7 +199,7 @@ example_dim <- attr(example_png, "info")$dim
 grid::grid.raster(example_png, interpolate = TRUE)
 ```
 
-For the users who received the experimental user experience (UX), each additional wiki's top result was shown as a box in a sidebar with a link to view more results (see `r figure_caps("Example", display = "cite")`[^screenshot]). There were two groups of users who received the experimental UX and one control group that did not:
+For the users who received the experimental user experience (UX), each additional wiki's top result was shown as a box in a sidebar with a link to view more results (see `r figure_caps("Example", display = "cite")`[^screenshot]). There was one group of users who received the experimental UX and one control group that did not:
 
 [^screenshot]: [Screenshot by Deb Tankersley](https://commons.wikimedia.org/wiki/File:Sister_Projects_search_results_second_test_screen_sample.png) available on [Wikimedia Commons](https://commons.wikimedia.org/wiki/Main_Page), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en).
 
@@ -310,7 +310,7 @@ experiment_edges <- list(
 )
 ```
 
-The data was collected according to the [TSS2 schema, revision 16270835](https://meta.wikimedia.org/w/index.php?title=Schema:TestSearchSatisfaction2&direction=next&oldid=15922352). `r figure_caps("Flow of users", display = "cite")` shows the flow of Wikipeda visitors on Desktop. Approximately `r sprintf("%.1f%%", 100 * (1 - experiment_edges$"Wikipedia visitors on Desktop"$"Other Languages"))`[^uniques] of the unique desktop devices that visit the 270[^wdqs] Wikipedias are accounted for by the 8 languages. In general, desktop users are randomly selected for anonymous tracking at a rate of 1 in 200, but for 8 wikis we changed the sampling rates to those shown in `r table_caps("Sampling Rates", display = "cite")`[^sampling].
+The data was collected according to the [TSS2 schema, revision 16270835](https://meta.wikimedia.org/w/index.php?title=Schema:TestSearchSatisfaction2&direction=next&oldid=15922352). `r figure_caps("Flow of users", display = "cite")` shows the flow of Wikipedia visitors on Desktop. Approximately `r sprintf("%.1f%%", 100 * (1 - experiment_edges$"Wikipedia visitors on Desktop"$"Other Languages"))`[^uniques] of the unique desktop devices that visit the 270[^wdqs] Wikipedias are accounted for by the 8 languages. In general, desktop users are randomly selected for anonymous tracking at a rate of 1 in 200, but for 8 wikis we changed the sampling rates to those shown in `r table_caps("Sampling Rates", display = "cite")`[^sampling].
 
 ```{r sampling_rates, echo=FALSE}
 sampling_rates <- data.frame(
@@ -324,7 +324,7 @@ sampling_rates[c("arwiki", "cawiki", "frwiki", "dewiki", "itwiki", "fawiki", "pl
   fable(format_caption(table_caps, "Sampling Rates"))
 ```
 
-Users who made it into the test were then randomly assigned to one of the three groups described above: <span class="test-group-1">Control</span> and <span class="test-group-2">Test</span>.
+Users who made it into the test were then randomly assigned to one of the two groups described above: <span class="test-group-1">Control</span> and <span class="test-group-2">Test</span>.
 
 [^sampling]: To see the sampling configuration, refer to [Gerrit change 343104](https://gerrit.wikimedia.org/r/#/c/343104).
 
@@ -403,7 +403,7 @@ click_counts %>%
 
 ## Zero Results Rate (ZRR)
 
-The zero results rate (ZRR) -- proportion of searches yielding zero results -- is one of Discovery's Search Team's key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results' relevance). While we were primarily interested in searchers' engagement with the search result for this test, we included this section as a consistency check -- that the zero results rate is lower when a cross-wiki search is performed (see `r figure_caps("zero_results_rate", display = "cite")`).
+The zero results rate (ZRR) -- proportion of searches yielding zero results -- is one of Discovery's Search Team's key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results' relevance). While we were primarily interested in searchers' engagement with the search result for this test, we included this section as a consistency check -- that the zero results rate is lower when a cross-wiki search is performed (see `r figure_caps("ZRR", display = "cite")`).
 
 ```{r zrr_data}
 zrr <- searches %>%
@@ -495,7 +495,7 @@ In `r figure_caps("ZRR by language", display = "cite")`, we broke the ZRR from `
 
 ## Engagement
 
-We used the clickthrough rate as an indicator of users' engagement with search results and as a measure of the results' relevance. That is, if we present users with more relevant results (such as those from Wikipedia's sister projects), then we expect the clickthrough rate to be higher in the two test groups compared to that of controls. `r figure_caps("Counts", display = "cite")` shows that various search activity measures did not vary too much from one group to another.
+We used the clickthrough rate as an indicator of users' engagement with search results and as a measure of the results' relevance. That is, if we present users with more relevant results (such as those from Wikipedia's sister projects), then we expect the clickthrough rate to be higher in the test group compared to that of controls. `r figure_caps("Counts", display = "cite")` shows that various search activity measures did not vary too much from one group to another.
 
 ```{r counts_data}
 counts <- searches %>%
@@ -750,9 +750,9 @@ BCCT.estimates %>%
   fable(format_caption(table_caps, "Log-linear Model"))
 ```
 
-Under the $\chi^2$ discrepancy statistic, the Bayesian *p* value of `r BCCT.summary$pval_stats$pval` does *not* indicate that the interaction model is inadequate. Futhermore, Kass and Raftery [-@Kass:1995vb] suggest that $2~\log_e(\mathrm{Bayes Factor}) = `r 2*log(BF)`$ is `r interpret_bf(BF)`. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.
+Under the $\chi^2$ discrepancy statistic, the Bayesian *p* value of `r BCCT.summary$pval_stats$pval` does *not* indicate that the interaction model is inadequate. Furthermore, Kass and Raftery [-@Kass:1995vb] suggest that $2~\log_e(\mathrm{Bayes Factor}) = `r 2*log(BF)`$ is `r interpret_bf(BF)`. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.
 
-`r table_caps("Log-linear Model", display = "cite")` summarizes the MCMC results of fitting a Bayesian log-linear model to the data in `r table_caps("Sister Clicks", display = "cite")`. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasing the negative estimate for "3+ sister projects and 1 cross-wiki click" (`r BCCT.estimates$post_mean[9]`) to the positive estimates for "2/3+ sister projects and 2+ cross-wiki clicks" (`r BCCT.estimates$post_mean[11]` and `r BCCT.estimates$post_mean[12]`, respectively), _the model suggests the relationship is **positive** -- that more sister projects shown to the user yields more cross-wiki clicks, up to a point_.
+`r table_caps("Log-linear Model", display = "cite")` summarizes the MCMC results of fitting a Bayesian log-linear model to the data in `r table_caps("Sister Clicks", display = "cite")`. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasting the negative estimate for "3+ sister projects and 1 cross-wiki click" (`r BCCT.estimates$post_mean[9]`) to the positive estimates for "2/3+ sister projects and 2+ cross-wiki clicks" (`r BCCT.estimates$post_mean[11]` and `r BCCT.estimates$post_mean[12]`, respectively), _the model suggests the relationship is **positive** -- that more sister projects shown to the user yields more cross-wiki clicks, up to a point_.
 
 ```{r single_clicks}
 single_clicks <- searches %>%
