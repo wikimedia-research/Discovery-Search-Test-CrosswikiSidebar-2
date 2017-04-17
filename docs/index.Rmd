@@ -20,13 +20,6 @@ abstract: >
   
   That is, there does not appear to be overwhelming evidence that we should *not* continue with the cross-wiki search project, and we are left to wonder if -- perhaps -- there are cultural differences at play, but this would require research (see Discussion).
 output:
-  pdf_document:
-    citation_package: natbib
-    fig_height: 6
-    fig_width: 10
-    keep_tex: yes
-    latex_engine: xelatex
-    template: svm-latex-ms.tex
   html_document:
     includes:
       after_body: suffix.html
@@ -45,6 +38,13 @@ output:
     toc_depth: 4
     toc_float:
       collapsed: no
+  pdf_document:
+    citation_package: natbib
+    fig_height: 6
+    fig_width: 10
+    keep_tex: yes
+    latex_engine: xelatex
+    template: svm-latex-ms.tex
 bibliography: bibliography.bib
 link-citations: yes
 nocite: |

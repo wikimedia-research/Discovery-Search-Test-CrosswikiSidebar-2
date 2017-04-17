@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2017-04-07" />
+<meta name="date" content="2017-04-17" />
 
 <title>Second Test Of Cross-wiki Search</title>
 
@@ -292,7 +292,7 @@ Product Manager (Search Backend), Wikimedia Foundation<br><h4 class="author"><em
 <address class="author_afil">
 Data Analyst, Wikimedia Foundation<br><h4 class="author"><em>Deb Tankersley</em></h4>
 <address class="author_afil">
-Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>07 April 2017</em></h4>
+Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>17 April 2017</em></h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 <p>Discovery’s Frontend and Backend Search teams ran an A/B test from 17 March 2017 to 27 March 2017 to assess the effectiveness of performing cross-wiki searches and showing results from sister projects (such as Wikisource and Wikiquote) to randomly selected users on Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias. We found that relatively few users clicked on the cross-wiki results and that overall engagement varied greatly across the wikis. For example, while Test group users were more likely to engage with their (cross-wiki and same-wiki) search results than the Control group were with their (same-wiki only) results on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis’ recommendation is to move forward with the cross-wiki search project. That is, there does not appear to be overwhelming evidence that we should <em>not</em> continue with the cross-wiki search project, and we are left to wonder if – perhaps – there are cultural differences at play, but this would require research (see Discussion).</p>
@@ -321,14 +321,14 @@ $(function() {
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>Within the <a href="https://wikimediafoundation.org/wiki/Home">Wikimedia Foundation</a>’s <a href="https://www.mediawiki.org/wiki/Wikimedia_Engineering">Engineering group</a>, the <a href="https://www.mediawiki.org/wiki/Wikimedia_Discovery">Discovery department</a>’s mission is to make the wealth of knowledge and content in the <a href="https://wikimediafoundation.org/wiki/Our_projects">Wikimedia projects</a> (such as <a href="https://www.wikipedia.org/">Wikipedia</a>) easily discoverable. The Search team is responsible for maintaining and enhancing the search features and APIs for MediaWiki, such as language detection – i.e. if a French Wikipedia visitor searches and gets fewer than 3 results, we check if maybe their query is in another language, and if our language detection determines that the query’s language is most likely German (for example), then in addition to results from French Wikipedia, they would also get results from German Wikipedia, if any.</p>
-<p>Specifically, the <a href="https://www.mediawiki.org/wiki/Wikimedia_Discovery/Search">Search team</a>’s current goal is to add cross-wiki searching – that is, providing search results from other (also referred to as “sister”) Wikimedia projects (“<em>wikis</em>”) within the same language. For example, if a work (e.g. a book or poem) on French Wikisource matched the user’s query, that user would be shown results from French Wikisource in addition to any results from French Wikipedia. In our previous report <span class="citation">(<a href="#ref-Prev-report">2017</a>)</span>, we showed that there was some evidence that suggested thsee additional “cross-wiki” search results helped user engagement but due to some issues with the user interface the results were not definitive, and so this test was meant to be a follow-up for us after we corrected those issues.</p>
+<p>Specifically, the <a href="https://www.mediawiki.org/wiki/Wikimedia_Discovery/Search">Search team</a>’s current goal is to add cross-wiki searching – that is, providing search results from other (also referred to as “sister”) Wikimedia projects (“<em>wikis</em>”) within the same language. For example, if a work (e.g. a book or poem) on French Wikisource matched the user’s query, that user would be shown results from French Wikisource in addition to any results from French Wikipedia. In our previous report <span class="citation">(<a href="#ref-Prev-report">2017</a>)</span>, we showed that there was some evidence that suggested these additional “cross-wiki” search results helped user engagement but due to some issues with the user interface the results were not definitive, and so this test was meant to be a follow-up for us after we corrected those issues.</p>
 <div class="figure" style="text-align: center">
 <img src="index_files/figure-html/example_figure-1.png" alt="**Figure 1**: Example of cross-wiki search results on German Wikipedia, with sister wikis in the sidebar ordered according to recall. Multimedia results (including results from Wikimedia Commons) are shown first, regardless of the sidebar ordering." height="4in" />
 <p class="caption">
 <strong>Figure 1</strong>: Example of cross-wiki search results on German Wikipedia, with sister wikis in the sidebar ordered according to recall. Multimedia results (including results from Wikimedia Commons) are shown first, regardless of the sidebar ordering.
 </p>
 </div>
-<p>For the users who received the experimental user experience (UX), each additional wiki’s top result was shown as a box in a sidebar with a link to view more results (see Figure 1<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>). There were two groups of users who received the experimental UX and one control group that did not:</p>
+<p>For the users who received the experimental user experience (UX), each additional wiki’s top result was shown as a box in a sidebar with a link to view more results (see Figure 1<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>). There was one group of users who received the experimental UX and one control group that did not:</p>
 <dl>
 <dt><span class="test-group-1">Control</span></dt>
 <dd>This group received the baseline user experience, which only includes the search results from the wiki they are on. To make their experience comparable to the test groups with respect to latency, we performed the search across the additional indices, but did not show the results to the end user.
@@ -417,7 +417,7 @@ experiment_edges &lt;-<span class="st"> </span><span class="kw">list</span>(
   ),
   <span class="st">&quot;In A/B Test&quot;</span> =<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;Control&quot;</span> =<span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>, <span class="st">&quot;Test&quot;</span> =<span class="st"> </span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)
 )</code></pre></div>
-<p>The data was collected according to the <a href="https://meta.wikimedia.org/w/index.php?title=Schema:TestSearchSatisfaction2&amp;direction=next&amp;oldid=15922352">TSS2 schema, revision 16270835</a>. Figure 2 shows the flow of Wikipeda visitors on Desktop. Approximately 26.3%<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> of the unique desktop devices that visit the 270<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> Wikipedias are accounted for by the 8 languages. In general, desktop users are randomly selected for anonymous tracking at a rate of 1 in 200, but for 8 wikis we changed the sampling rates to those shown in Table 1<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>.</p>
+<p>The data was collected according to the <a href="https://meta.wikimedia.org/w/index.php?title=Schema:TestSearchSatisfaction2&amp;direction=next&amp;oldid=15922352">TSS2 schema, revision 16270835</a>. Figure 2 shows the flow of Wikipedia visitors on Desktop. Approximately 26.3%<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> of the unique desktop devices that visit the 270<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> Wikipedias are accounted for by the 8 languages. In general, desktop users are randomly selected for anonymous tracking at a rate of 1 in 200, but for 8 wikis we changed the sampling rates to those shown in Table 1<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>.</p>
 <?xml version="1.0" encoding="UTF-8"?>
 <table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
 <caption>
@@ -553,7 +553,7 @@ Russian
 </tr>
 </tbody>
 </table>
-<p>Users who made it into the test were then randomly assigned to one of the three groups described above: <span class="test-group-1">Control</span> and <span class="test-group-2">Test</span>.</p>
+<p>Users who made it into the test were then randomly assigned to one of the two groups described above: <span class="test-group-1">Control</span> and <span class="test-group-2">Test</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ds &lt;-<span class="st"> </span>riverplot<span class="op">::</span><span class="kw">default.style</span>(); ds<span class="op">$</span>col &lt;-<span class="st"> &quot;gray&quot;</span>; ds<span class="op">$</span>srt &lt;-<span class="st"> </span><span class="dv">30</span>
 visitor_flow &lt;-<span class="st"> </span>riverplot<span class="op">::</span><span class="kw">makeRiver</span>(
   experiment_nodes, experiment_edges,
@@ -829,7 +829,7 @@ All 2 groups
 </table>
 <div id="zero-results-rate-zrr" class="section level2">
 <h2>Zero Results Rate (ZRR)</h2>
-<p>The zero results rate (ZRR) – proportion of searches yielding zero results – is one of Discovery’s Search Team’s key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results’ relevance). While we were primarily interested in searchers’ engagement with the search result for this test, we included this section as a consistency check – that the zero results rate is lower when a cross-wiki search is performed (see Figure 9).</p>
+<p>The zero results rate (ZRR) – proportion of searches yielding zero results – is one of Discovery’s Search Team’s key performance indicators (KPIs), and we are always interested in lowering that number (but not at the expense of results’ relevance). While we were primarily interested in searchers’ engagement with the search result for this test, we included this section as a consistency check – that the zero results rate is lower when a cross-wiki search is performed (see Figure 3).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">zrr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group, serp_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(
@@ -862,7 +862,7 @@ All 2 groups
 </div>
 <div id="engagement" class="section level2">
 <h2>Engagement</h2>
-<p>We used the clickthrough rate as an indicator of users’ engagement with search results and as a measure of the results’ relevance. That is, if we present users with more relevant results (such as those from Wikipedia’s sister projects), then we expect the clickthrough rate to be higher in the two test groups compared to that of controls. Figure 5 shows that various search activity measures did not vary too much from one group to another.</p>
+<p>We used the clickthrough rate as an indicator of users’ engagement with search results and as a measure of the results’ relevance. That is, if we present users with more relevant results (such as those from Wikipedia’s sister projects), then we expect the clickthrough rate to be higher in the test group compared to that of controls. Figure 5 shows that various search activity measures did not vary too much from one group to another.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">counts &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(wiki, group, session_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">searches =</span> <span class="kw">length</span>(<span class="kw">unique</span>(serp_id)),
@@ -872,9 +872,9 @@ All 2 groups
 <span class="st">  </span>ungroup <span class="op">%&gt;%</span>
 <span class="st">  </span>tidyr<span class="op">::</span><span class="kw">gather</span>(metric, value, <span class="op">-</span><span class="kw">c</span>(wiki, group))</code></pre></div>
 <div class="figure">
-<img src="index_files/figure-html/counts_plot-1.png" alt="**Figure 5**: Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user." width="\textwidth" />
+<img src="index_files/figure-html/counts_plot-1.png" alt="**Figure 5**: Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the two groups had very similar average searches per user." width="\textwidth" />
 <p class="caption">
-<strong>Figure 5</strong>: Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the three groups had very similar average searches per user.
+<strong>Figure 5</strong>: Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the two groups had very similar average searches per user.
 </p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">searches_H1 &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
@@ -1328,8 +1328,8 @@ Estimate
 </tr>
 </tbody>
 </table>
-<p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian <em>p</em> value of 0.502 does <em>not</em> indicate that the interaction model is inadequate. Futhermore, Kass and Raftery <span class="citation">(<a href="#ref-Kass:1995vb">1995</a>)</span> suggest that <span class="math inline">\(2~\log_e(\mathrm{Bayes Factor}) = 290.468\)</span> is very strong evidence against null hypothesis of independence. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.</p>
-<p>Table 6 summarizes the MCMC results of fitting a Bayesian log-linear model to the data in Table 5. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasing the negative estimate for “3+ sister projects and 1 cross-wiki click” (-0.641) to the positive estimates for “2/3+ sister projects and 2+ cross-wiki clicks” (0.969 and 1.166, respectively), <em>the model suggests the relationship is <strong>positive</strong> – that more sister projects shown to the user yields more cross-wiki clicks, up to a point</em>.</p>
+<p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian <em>p</em> value of 0.502 does <em>not</em> indicate that the interaction model is inadequate. Furthermore, Kass and Raftery <span class="citation">(<a href="#ref-Kass:1995vb">1995</a>)</span> suggest that <span class="math inline">\(2~\log_e(\mathrm{Bayes Factor}) = 290.468\)</span> is very strong evidence against null hypothesis of independence. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.</p>
+<p>Table 6 summarizes the MCMC results of fitting a Bayesian log-linear model to the data in Table 5. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasting the negative estimate for “3+ sister projects and 1 cross-wiki click” (-0.641) to the positive estimates for “2/3+ sister projects and 2+ cross-wiki clicks” (0.969 and 1.166, respectively), <em>the model suggests the relationship is <strong>positive</strong> – that more sister projects shown to the user yields more cross-wiki clicks, up to a point</em>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">single_clicks &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">!=</span><span class="st"> &quot;Control&quot;</span>, <span class="st">`</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>, <span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
