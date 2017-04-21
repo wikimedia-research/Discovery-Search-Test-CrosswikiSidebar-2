@@ -16,7 +16,7 @@ author:
 abstract: >
   Discovery's Frontend and Backend Search teams ran an A/B test from 17 March 2017 to 27 March 2017 to assess the effectiveness of performing cross-wiki searches and showing results from sister projects (such as Wikisource and Wikiquote) to randomly selected users on Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias. We found that relatively few users clicked on the cross-wiki results and that overall engagement varied greatly across the wikis.
   
-  For example, while Test group users were more likely to engage with their (cross-wiki and same-wiki) search results than the Control group were with their (same-wiki only) results on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis' recommendation is to move forward with the cross-wiki search project.
+  For example, Test group users were more likely to engage with their (cross-wiki and same-wiki) search results than the Control group were with their (same-wiki only) results on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis's recommendation is to move forward with the cross-wiki search project.
   
   That is, there does not appear to be overwhelming evidence that we should *not* continue with the cross-wiki search project, and we are left to wonder if -- perhaps -- there are cultural differences at play, but this would require research (see Discussion).
 output:
@@ -160,11 +160,11 @@ print_caption <- function(formatted_caption) {
 # Add captions:
 figure_caps(name = "Example", caption = "Example of cross-wiki search results on German Wikipedia, with sister wikis in the sidebar ordered according to recall. Multimedia results (including results from Wikimedia Commons) are shown first, regardless of the sidebar ordering.")
 figure_caps(name = "Flow of users", caption = "Flow of Wikipedia visitors into the A/B test.", display = FALSE)
-table_caps(name = "Sampling Rates", caption = "Sampling rates used for event logging (EL) and random selection into the A/B test.")
+table_caps(name = "Sampling Rates", caption = "Sampling rates used for event logging (EL) and random selection into the A/B test. The two sets of rates were calculated based on the desired sample size and the traffic of each wiki, while also leaving enough event logged sessions for computing metrics. Note: being selected for the test is contingent on being selected for EL.")
 table_caps(name = "Session Counts", caption = "Number of search sessions used for analysis by wiki and group. Each search session may have several individual searches.")
 table_caps(name = "Click Counts", caption = "Number of click events by group.")
 figure_caps(name = "ZRR", caption = "Proportion of searches yielding zero results broken up by group, wiki, and type of results (same-wiki only vs. including cross-wiki results).")
-figure_caps(name = "ZRR by language", caption = "The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.")
+figure_caps(name = "ZRR by language", caption = "The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates. The ZRR was calculated using back-end search logs, which included searches from controls. To control for lag, we performed cross-wiki searches for everyone in the A/B test, regardless of group membership.")
 figure_caps(name = "Counts", caption = "Average number of searches, average number of search engine result pages (SERPs), total searches, total SERPs, and total sessions by group and wiki. The groups did not appear to behave too differently. For example, the two groups had very similar average searches per user.")
 figure_caps(name = "Clickthrough Rates (1)", caption = "Clickthrough rates of experimental groups, split by wiki.")
 figure_caps(name = "Clickthrough Rates (2)", caption = "Day-by-day clickthrough rates of experimental groups, split by wiki.")
@@ -316,7 +316,7 @@ The data was collected according to the [TSS2 schema, revision 16270835](https:/
 sampling_rates <- data.frame(
   Language = c("Arabic", "Catalan", "German", "Persian", "French", "Italian", "Polish", "Russian"),
   `Chance of getting selected for EL` = paste("1 in", c(25, 6, 108, 8, 70, 42, 35, 71)),
-  `Chance of getting into A/B Test` = paste("1 in", c(8, 34, 2, 25, 3, 5, 6, 3)),
+  `Chance of getting into A/B Test*` = paste("1 in", c(8, 34, 2, 25, 3, 5, 6, 3)),
   row.names = c("arwiki", "cawiki", "dewiki", "fawiki", "frwiki", "itwiki", "plwiki", "ruwiki"),
   check.names = FALSE, stringsAsFactors = FALSE
 )
@@ -366,7 +366,7 @@ We employed the *binom* [@R-binom], *LearnBayes* [@R-learnbayes], *conting* [@R-
 
 # Results
 
-After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of `r dplyr::n_distinct(searches$session_id, searches$group, searches$wiki)` search sessions with the full breakdown by wiki and group (see `r table_caps("Session Counts", display = "cite")`). `r table_caps("Click Counts", display = "cite")` breaks down the counts of clicks on same-wiki results (e.g. a Catalan Wikipedia visitor clicking on a Catalan Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).
+After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of `r dplyr::n_distinct(searches$session_id, searches$group, searches$wiki)` search sessions (see `r table_caps("Session Counts", display = "cite")` for the full breakdown by wiki and group). `r table_caps("Click Counts", display = "cite")` breaks down the counts of clicks on same-wiki results (e.g. a Italian Wikipedia visitor clicking on a Italian Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).
 
 ```{r summary_stats_data}
 session_counts <- searches %>%
@@ -378,7 +378,7 @@ session_counts <- searches %>%
 ```{r summary_stats_table, results='asis', echo=FALSE}
 session_counts %>%
   as.data.frame.matrix %>%
-  set_colnames(c("Control", "Test", "All 2 groups")) %>%
+  set_colnames(c("Control", "Test", "Both")) %>%
   set_rownames(c("Arabic Wikipedia", "Catalan Wikipedia", "French Wikipedia", 
 "German Wikipedia", "Italian Wikipedia", "Persian Wikipedia", 
 "Polish Wikipedia", "Russian Wikipedia", "All 8 wikis")) %>%
@@ -396,7 +396,7 @@ click_counts <- searches %>%
 ```{r click_counts_table, results='asis', echo=FALSE}
 click_counts %>%
   as.data.frame.matrix %>%
-  set_rownames(c("Control", "Test", "All 2 groups")) %>%
+  set_rownames(c("Control", "Test", "Both")) %>%
   set_colnames(c("Same-wiki clicks", "Sister-project clicks", "Textcat clicks", "Overall clicks")) %>%
   fable(format_caption(table_caps, "Click Counts"))
 ```
@@ -480,7 +480,7 @@ searches %>%
   labs(x = NULL, y = NULL, color = "Language", linetype = NULL,
        title = "Zero results rate (ZRR) of Wikipedia and cross-wiki searches in A/B test, broken down by project and language",
        subtitle = "Dotted horizontal line indicates each project's overall ZRR, across all the languages it is available in, calculated using EL data from the same schema",
-       caption = "At the time of the report, Wikiversity does not exist in Catalan, Persian,and Polish; Wikivoyage does not exist in Catalan. Hence the 100% zero results rate.") +
+       caption = "At the time of the report, Wikiversity does not exist in Catalan, Persian, and Polish; Wikivoyage does not exist in Arabic and Catalan. Hence the 100% zero results rate.") +
   theme_minimal(base_family = "GillSans") +
   theme(legend.position = "bottom",
         panel.grid.major.x = element_blank(),
@@ -491,7 +491,9 @@ searches %>%
         panel.border = element_rect(color = "gray30", fill = NA))
 ```
 
-In `r figure_caps("ZRR by language", display = "cite")`, we broke the ZRR from `r figure_caps("ZRR", display = "cite")` down by language and project and included a reference marker for each project's overall ZRR (aggregated across all the languages the project is available in). Almost all of the projects are available (at the time of the test and at the time of writing this report) in Catalan, Italian, Persian, and Polish. Of particular note are the overall ZRR of projects like Wikinews and Wiktionary (both exist in Catalan, Italian, Persian, and Polish), which appear to be much lower than the ZRR observed in this test. In fact, the ZRR in these four languages is much higher than the overall ZRR for every project. We suspect this is partly responsible for the low sister-project click counts seen in `r table_caps("Click Counts", display = "cite")`.
+In `r figure_caps("ZRR by language", display = "cite")`, we broke the ZRR from `r figure_caps("ZRR", display = "cite")` down by language and project and included a reference marker for each project's overall ZRR (aggregated across all the languages the project is available in). Almost all of the projects are available (at the time of the test and at the time of writing this report) in Catalan, Italian, Persian, and Polish. Of particular note are the overall ZRR of projects like Wikinews and Wiktionary (both exist in Catalan, Italian, Persian, and Polish), which appear to be much lower than the ZRR observed in this test.
+
+In fact, the ZRR in these four languages is much higher than the overall ZRR for every project. We suspect this is partly responsible for the low sister-project click counts seen in `r table_caps("Click Counts", display = "cite")`. This supports our previous intuition that people search differently on different projects and that people sometimes tailor their searches to the project they are on. For example, searching for "Barack Obama birthdate" or "Fast and Furious movies" on Wikipedia simply does not make a whole lot of sense on other projects such as Wiktionary and Wikivoyage.
 
 ## Engagement
 
@@ -581,6 +583,7 @@ searches_H2 <- searches %>%
   group_by(date, wiki, group) %>%
   dplyr::do(binom::binom.bayes(.$clickthroughs, .$searches, conf.level = 0.95))
 ```
+
 ```{r hypotheses_caption, include=FALSE}
 hypotheses_cap <- c(format_caption(figure_caps, "Clickthrough Rates (1)"), format_caption(figure_caps, "Clickthrough Rates (2)"))
 ```
@@ -688,7 +691,7 @@ In Figures `r figure_caps("Clickthrough Rates (1)", display = "num")`, `r figure
 
 ```{r sister_clickthrough, cache=TRUE, dependson='data'}
 indices_subset <- indices %>%
-  keep_where(!(project %in% c("commons", "wikipedia"))) %>%
+  keep_where(!(project %in% c("wikipedia"))) %>%
   group_by(cirrus_id) %>%
   summarize(sisters = length(unique(project[n_results > 0])))
 sister_ctr <- searches %>%
@@ -711,9 +714,11 @@ sister_ctr <- searches %>%
       .$sisters == 1 ~ "1",
       .$sisters == 2 ~ "2",
       .$sisters > 2 ~ "3+"
-    )
+    ),
+    invalid = (`clicks (sister project)` %in% c("1", "2+")) & (sisters == "0")
   ) %>%
-  keep_where(!(`clicks (sister project)` %in% c("1", "2", "3+") & sisters == "0")) %>%
+  keep_where(!invalid) %>%
+  select(-invalid) %>%
   group_by(`clicks (sister project)`, sisters) %>%
   dplyr::count() %>%
   ungroup %>%
@@ -721,7 +726,7 @@ sister_ctr <- searches %>%
 ```
 ```{r sister_clickthrough_tbl, results='asis', echo=FALSE}
 sister_ctr %>%
-  set_colnames(paste(colnames(.), "cross-wiki clicks")) %>%
+  set_colnames(c("0 cross-wiki clicks", "1 cross-wiki click", "2+ cross-wiki clicks")) %>%
   set_rownames(paste(rownames(.), "sister projects")) %>%
   fable(format_caption(table_caps, "Sister Clicks"))
 ```
@@ -752,7 +757,7 @@ BCCT.estimates %>%
 
 Under the $\chi^2$ discrepancy statistic, the Bayesian *p* value of `r BCCT.summary$pval_stats$pval` does *not* indicate that the interaction model is inadequate. Furthermore, Kass and Raftery [-@Kass:1995vb] suggest that $2~\log_e(\mathrm{Bayes Factor}) = `r 2*log(BF)`$ is `r interpret_bf(BF)`. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.
 
-`r table_caps("Log-linear Model", display = "cite")` summarizes the MCMC results of fitting a Bayesian log-linear model to the data in `r table_caps("Sister Clicks", display = "cite")`. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasting the negative estimate for "3+ sister projects and 1 cross-wiki click" (`r BCCT.estimates$post_mean[9]`) to the positive estimates for "2/3+ sister projects and 2+ cross-wiki clicks" (`r BCCT.estimates$post_mean[11]` and `r BCCT.estimates$post_mean[12]`, respectively), _the model suggests the relationship is **positive** -- that more sister projects shown to the user yields more cross-wiki clicks, up to a point_.
+`r table_caps("Log-linear Model", display = "cite")` summarizes the [Markov chain Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC) results of fitting a Bayesian [log-linear model](https://en.wikipedia.org/wiki/Log-linear_model) to the data in `r table_caps("Sister Clicks", display = "cite")`. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasting the negative estimate for "3+ sister projects and 1 cross-wiki click" (`r BCCT.estimates$post_mean[9]`) to the positive estimates for "2/3+ sister projects and 2+ cross-wiki clicks" (`r BCCT.estimates$post_mean[11]` and `r BCCT.estimates$post_mean[12]`, respectively, with the lower bounds of both HPD intervals being greater than zero), _the model strongly suggests the relationship is **positive** -- that more sister projects shown to the user yields more cross-wiki clicks, up to a point_.
 
 ```{r single_clicks}
 single_clicks <- searches %>%
@@ -775,6 +780,10 @@ Of the `r length(unique(searches$serp_id[searches$event == "sister-project click
 We are not actually sure why there is such a drastic negative difference between the two groups on German Wikipedia since we are not actually removing any search results, and we would expect users to at least have an engagement rate [in the same ballpark](https://en.wiktionary.org/wiki/in_the_ballpark), and it is interesting to see a similar negative difference on Italian Wikipedia also. From a technical implementation perspective, there should not have been anything particular about those two wikis that impacted event logging or display of results. Perhaps there is a cultural difference in task/intent -- such that when users saw previews of results from the other projects, perhaps they learned what they wanted to learn, and with their curiosity satisfied, did not feel the need to click on any results -- but that would require considerable human-computer interaction research to confirm or reject.
 
 We also suspect that the high zero results rate for each of the sister projects for these languages may have been responsible for the few sister-project clicks. As shown in `r table_caps("Log-linear Model", display = "cite")` in the [Engagement] analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.
+
+# Acknowledgements
+
+Finally, we would like to thank our colleagues Trey Jones (Software Engineer, Wikimedia Foundation) and Chelsy Xie (Data Analyst, Wikimedia Foundation) for their reviews of and feedback on this report.
 
 ```{r bibliograpby, results='asis', echo=FALSE}
 if (is_html()) {

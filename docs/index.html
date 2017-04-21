@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2017-04-17" />
+<meta name="date" content="2017-04-20" />
 
 <title>Second Test Of Cross-wiki Search</title>
 
@@ -292,10 +292,10 @@ Product Manager (Search Backend), Wikimedia Foundation<br><h4 class="author"><em
 <address class="author_afil">
 Data Analyst, Wikimedia Foundation<br><h4 class="author"><em>Deb Tankersley</em></h4>
 <address class="author_afil">
-Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>17 April 2017</em></h4>
+Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>20 April 2017</em></h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
-<p>Discovery’s Frontend and Backend Search teams ran an A/B test from 17 March 2017 to 27 March 2017 to assess the effectiveness of performing cross-wiki searches and showing results from sister projects (such as Wikisource and Wikiquote) to randomly selected users on Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias. We found that relatively few users clicked on the cross-wiki results and that overall engagement varied greatly across the wikis. For example, while Test group users were more likely to engage with their (cross-wiki and same-wiki) search results than the Control group were with their (same-wiki only) results on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis’ recommendation is to move forward with the cross-wiki search project. That is, there does not appear to be overwhelming evidence that we should <em>not</em> continue with the cross-wiki search project, and we are left to wonder if – perhaps – there are cultural differences at play, but this would require research (see Discussion).</p>
+<p>Discovery’s Frontend and Backend Search teams ran an A/B test from 17 March 2017 to 27 March 2017 to assess the effectiveness of performing cross-wiki searches and showing results from sister projects (such as Wikisource and Wikiquote) to randomly selected users on Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias. We found that relatively few users clicked on the cross-wiki results and that overall engagement varied greatly across the wikis. For example, Test group users were more likely to engage with their (cross-wiki and same-wiki) search results than the Control group were with their (same-wiki only) results on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis’s recommendation is to move forward with the cross-wiki search project. That is, there does not appear to be overwhelming evidence that we should <em>not</em> continue with the cross-wiki search project, and we are left to wonder if – perhaps – there are cultural differences at play, but this would require research (see Discussion).</p>
 </div>
 
 </div>
@@ -421,7 +421,7 @@ experiment_edges &lt;-<span class="st"> </span><span class="kw">list</span>(
 <?xml version="1.0" encoding="UTF-8"?>
 <table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
 <caption>
-<strong>Table 1</strong>: Sampling rates used for event logging (EL) and random selection into the A/B test.
+<strong>Table 1</strong>: Sampling rates used for event logging (EL) and random selection into the A/B test. The two sets of rates were calculated based on the desired sample size and the traffic of each wiki, while also leaving enough event logged sessions for computing metrics. Note: being selected for the test is contingent on being selected for EL.
 </caption>
 <thead>
 <tr>
@@ -434,7 +434,7 @@ Language
 Chance of getting selected for EL
 </th>
 <th style="text-align:left;">
-Chance of getting into A/B Test
+Chance of getting into A/B Test*
 </th>
 </tr>
 </thead>
@@ -589,7 +589,7 @@ x &lt;-<span class="st"> </span><span class="kw">plot</span>(visitor_flow, <span
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<p>After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of 42278 search sessions with the full breakdown by wiki and group (see Table 2). Table 3 breaks down the counts of clicks on same-wiki results (e.g. a Catalan Wikipedia visitor clicking on a Catalan Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).</p>
+<p>After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of 42278 search sessions (see Table 2 for the full breakdown by wiki and group). Table 3 breaks down the counts of clicks on same-wiki results (e.g. a Italian Wikipedia visitor clicking on a Italian Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">session_counts &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(<span class="dt">Wiki =</span> wiki, group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sessions =</span> <span class="kw">length</span>(<span class="kw">unique</span>(session_id))) <span class="op">%&gt;%</span>
@@ -611,7 +611,7 @@ Control
 Test
 </th>
 <th style="text-align:right;">
-All 2 groups
+Both
 </th>
 </tr>
 </thead>
@@ -810,7 +810,7 @@ Test
 </tr>
 <tr>
 <td style="text-align:left;">
-All 2 groups
+Both
 </td>
 <td style="text-align:right;">
 25018
@@ -853,12 +853,13 @@ All 2 groups
 </p>
 </div>
 <div class="figure">
-<img src="index_files/figure-html/zrr_lang_plot-1.png" alt="**Figure 4**: The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates." width="\textwidth" />
+<img src="index_files/figure-html/zrr_lang_plot-1.png" alt="**Figure 4**: The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates. The ZRR was calculated using back-end search logs, which included searches from controls. To control for lag, we performed cross-wiki searches for everyone in the A/B test, regardless of group membership." width="\textwidth" />
 <p class="caption">
-<strong>Figure 4</strong>: The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates.
+<strong>Figure 4</strong>: The proportion of searches that yielded zero results was the lowest for Wikipedia and Wikisource, with the other projects having very high zero result rates. The ZRR was calculated using back-end search logs, which included searches from controls. To control for lag, we performed cross-wiki searches for everyone in the A/B test, regardless of group membership.
 </p>
 </div>
-<p>In Figure 4, we broke the ZRR from Figure 3 down by language and project and included a reference marker for each project’s overall ZRR (aggregated across all the languages the project is available in). Almost all of the projects are available (at the time of the test and at the time of writing this report) in Catalan, Italian, Persian, and Polish. Of particular note are the overall ZRR of projects like Wikinews and Wiktionary (both exist in Catalan, Italian, Persian, and Polish), which appear to be much lower than the ZRR observed in this test. In fact, the ZRR in these four languages is much higher than the overall ZRR for every project. We suspect this is partly responsible for the low sister-project click counts seen in Table 3.</p>
+<p>In Figure 4, we broke the ZRR from Figure 3 down by language and project and included a reference marker for each project’s overall ZRR (aggregated across all the languages the project is available in). Almost all of the projects are available (at the time of the test and at the time of writing this report) in Catalan, Italian, Persian, and Polish. Of particular note are the overall ZRR of projects like Wikinews and Wiktionary (both exist in Catalan, Italian, Persian, and Polish), which appear to be much lower than the ZRR observed in this test.</p>
+<p>In fact, the ZRR in these four languages is much higher than the overall ZRR for every project. We suspect this is partly responsible for the low sister-project click counts seen in Table 3. This supports our previous intuition that people search differently on different projects and that people sometimes tailor their searches to the project they are on. For example, searching for “Barack Obama birthdate” or “Fast and Furious movies” on Wikipedia simply does not make a whole lot of sense on other projects such as Wiktionary and Wikivoyage.</p>
 </div>
 <div id="engagement" class="section level2">
 <h2>Engagement</h2>
@@ -1044,7 +1045,7 @@ Russian Wikipedia
 <p>In Figures 6, 7, and 8, we see that engagement was higher in <span class="test-group-2">Test</span> than in <span class="test-group-1">Control</span> on 5 of the 8 wikis (Arabic, French, Persian, Polish, and Russian Wikipedias) but lower on the other 4 (Italian, Catalan, and most drastically German Wikipedias).</p>
 <p>Table 4 shows the <a href="https://en.wikipedia.org/wiki/Relative_risk">relative risk</a> – how much more likely each respective test group is to engage with the search results (same-wiki or cross-wiki) than the <span class="test-group-1">Control</span> group. For example, on Catalan Wikipedia, users in the <span class="test-group-2">Test</span> are 0.951 times more likely to click on a result than users in the <span class="test-group-1">Control</span> group. While most of the estimates are greater than 1 (suggesting more relevant results), the 95% <a href="https://en.wikipedia.org/wiki/Credible_interval">credible intervals</a> contain 1, meaning we do not have sufficient evidence to draw definitive conclusions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">indices_subset &lt;-<span class="st"> </span>indices <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(project <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;commons&quot;</span>, <span class="st">&quot;wikipedia&quot;</span>))) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(project <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;wikipedia&quot;</span>))) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cirrus_id) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sisters =</span> <span class="kw">length</span>(<span class="kw">unique</span>(project[n_results <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>])))
 sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
@@ -1067,9 +1068,11 @@ sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
       .<span class="op">$</span>sisters <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;1&quot;</span>,
       .<span class="op">$</span>sisters <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;2&quot;</span>,
       .<span class="op">$</span>sisters <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;3+&quot;</span>
-    )
+    ),
+    <span class="dt">invalid =</span> (<span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2+&quot;</span>)) <span class="op">&amp;</span><span class="st"> </span>(sisters <span class="op">==</span><span class="st"> &quot;0&quot;</span>)
   ) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>(<span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3+&quot;</span>) <span class="op">&amp;</span><span class="st"> </span>sisters <span class="op">==</span><span class="st"> &quot;0&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">keep_where</span>(<span class="op">!</span>invalid) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>invalid) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(<span class="st">`</span><span class="dt">clicks (sister project)</span><span class="st">`</span>, sisters) <span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">count</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span>ungroup <span class="op">%&gt;%</span>
@@ -1087,7 +1090,7 @@ sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 0 cross-wiki clicks
 </th>
 <th style="text-align:right;">
-1 cross-wiki clicks
+1 cross-wiki click
 </th>
 <th style="text-align:right;">
 2+ cross-wiki clicks
@@ -1100,13 +1103,13 @@ sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 0 sister projects
 </td>
 <td style="text-align:right;">
-14191
+14039
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-4
+0
 </td>
 </tr>
 <tr>
@@ -1114,13 +1117,13 @@ sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 1 sister projects
 </td>
 <td style="text-align:right;">
-5060
+5192
 </td>
 <td style="text-align:right;">
-93
+90
 </td>
 <td style="text-align:right;">
-18
+17
 </td>
 </tr>
 <tr>
@@ -1128,13 +1131,13 @@ sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 2 sister projects
 </td>
 <td style="text-align:right;">
-3668
+3679
 </td>
 <td style="text-align:right;">
-61
+64
 </td>
 <td style="text-align:right;">
-6
+7
 </td>
 </tr>
 <tr>
@@ -1142,7 +1145,7 @@ sister_ctr &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 3+ sister projects
 </td>
 <td style="text-align:right;">
-12261
+12270
 </td>
 <td style="text-align:right;">
 154
@@ -1199,10 +1202,10 @@ Estimate
 0 sister projects and 0 cross-wiki clicks
 </td>
 <td style="text-align:right;">
-4.767
+4.532
 </td>
 <td style="text-align:left;">
-(4.44, 5.00)
+(4.13, 4.89)
 </td>
 </tr>
 <tr>
@@ -1210,10 +1213,10 @@ Estimate
 1 sister project
 </td>
 <td style="text-align:right;">
--1.654
+-2.413
 </td>
 <td style="text-align:left;">
-(-2.61, -0.99)
+(-3.53, -1.35)
 </td>
 </tr>
 <tr>
@@ -1221,10 +1224,10 @@ Estimate
 2 sister projects
 </td>
 <td style="text-align:right;">
-0.535
+0.751
 </td>
 <td style="text-align:left;">
-(0.27, 0.89)
+(0.34, 1.16)
 </td>
 </tr>
 <tr>
@@ -1232,10 +1235,10 @@ Estimate
 3+ sister projects
 </td>
 <td style="text-align:right;">
--0.080
+0.226
 </td>
 <td style="text-align:left;">
-(-0.41, 0.28)
+(-0.17, 0.67)
 </td>
 </tr>
 <tr>
@@ -1243,10 +1246,10 @@ Estimate
 1 cross-wiki click
 </td>
 <td style="text-align:right;">
-4.161
+4.400
 </td>
 <td style="text-align:left;">
-(3.92, 4.47)
+(4.04, 4.80)
 </td>
 </tr>
 <tr>
@@ -1254,10 +1257,10 @@ Estimate
 2+ cross-wiki clicks
 </td>
 <td style="text-align:right;">
--1.747
+-1.530
 </td>
 <td style="text-align:left;">
-(-2.22, -1.26)
+(-2.10, -1.02)
 </td>
 </tr>
 <tr>
@@ -1265,10 +1268,10 @@ Estimate
 1 sister project and 1 cross-wiki click
 </td>
 <td style="text-align:right;">
-2.287
+3.030
 </td>
 <td style="text-align:left;">
-(1.62, 3.24)
+(1.97, 4.16)
 </td>
 </tr>
 <tr>
@@ -1276,10 +1279,10 @@ Estimate
 2 sister projects and 1 cross-wiki click
 </td>
 <td style="text-align:right;">
--0.934
+-1.128
 </td>
 <td style="text-align:left;">
-(-1.26, -0.65)
+(-1.50, -0.68)
 </td>
 </tr>
 <tr>
@@ -1287,10 +1290,10 @@ Estimate
 3+ sister projects and 1 cross-wiki click
 </td>
 <td style="text-align:right;">
--0.641
+-0.949
 </td>
 <td style="text-align:left;">
-(-1.00, -0.32)
+(-1.37, -0.51)
 </td>
 </tr>
 <tr>
@@ -1298,10 +1301,10 @@ Estimate
 1 sister project and 2+ cross-wiki clicks
 </td>
 <td style="text-align:right;">
--2.946
+-2.261
 </td>
 <td style="text-align:left;">
-(-4.48, -1.64)
+(-3.75, -0.72)
 </td>
 </tr>
 <tr>
@@ -1309,10 +1312,10 @@ Estimate
 2 sister projects and 2+ cross-wiki clicks
 </td>
 <td style="text-align:right;">
-0.969
+0.739
 </td>
 <td style="text-align:left;">
-(0.43, 1.44)
+(0.20, 1.25)
 </td>
 </tr>
 <tr>
@@ -1320,16 +1323,16 @@ Estimate
 3+ sister projects and 2+ cross-wiki clicks
 </td>
 <td style="text-align:right;">
-1.166
+0.931
 </td>
 <td style="text-align:left;">
-(0.58, 1.73)
+(0.38, 1.56)
 </td>
 </tr>
 </tbody>
 </table>
-<p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian <em>p</em> value of 0.502 does <em>not</em> indicate that the interaction model is inadequate. Furthermore, Kass and Raftery <span class="citation">(<a href="#ref-Kass:1995vb">1995</a>)</span> suggest that <span class="math inline">\(2~\log_e(\mathrm{Bayes Factor}) = 290.468\)</span> is very strong evidence against null hypothesis of independence. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.</p>
-<p>Table 6 summarizes the MCMC results of fitting a Bayesian log-linear model to the data in Table 5. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasting the negative estimate for “3+ sister projects and 1 cross-wiki click” (-0.641) to the positive estimates for “2/3+ sister projects and 2+ cross-wiki clicks” (0.969 and 1.166, respectively), <em>the model suggests the relationship is <strong>positive</strong> – that more sister projects shown to the user yields more cross-wiki clicks, up to a point</em>.</p>
+<p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian <em>p</em> value of 0.525 does <em>not</em> indicate that the interaction model is inadequate. Furthermore, Kass and Raftery <span class="citation">(<a href="#ref-Kass:1995vb">1995</a>)</span> suggest that <span class="math inline">\(2~\log_e(\mathrm{Bayes Factor}) = 301.608\)</span> is very strong evidence against null hypothesis of independence. This means there is evidence of a relationship between number of projects displayed and number of clicks on those sister-wiki results.</p>
+<p>Table 6 summarizes the <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov chain Monte Carlo</a> (MCMC) results of fitting a Bayesian <a href="https://en.wikipedia.org/wiki/Log-linear_model">log-linear model</a> to the data in Table 5. It suggests there is a strong interaction between number of projects returned and number of clicks on those projects. Contrasting the negative estimate for “3+ sister projects and 1 cross-wiki click” (-0.949) to the positive estimates for “2/3+ sister projects and 2+ cross-wiki clicks” (0.739 and 0.931, respectively, with the lower bounds of both HPD intervals being greater than zero), <em>the model strongly suggests the relationship is <strong>positive</strong> – that more sister projects shown to the user yields more cross-wiki clicks, up to a point</em>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">single_clicks &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">keep_where</span>(group <span class="op">!=</span><span class="st"> &quot;Control&quot;</span>, <span class="st">`</span><span class="dt">cirrus log: some sister-wiki results</span><span class="st">`</span>, <span class="st">`</span><span class="dt">cirrus log: some same-wiki results</span><span class="st">`</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(serp_id) <span class="op">%&gt;%</span>
@@ -1348,6 +1351,10 @@ Estimate
 <h1>Discussion</h1>
 <p>We are not actually sure why there is such a drastic negative difference between the two groups on German Wikipedia since we are not actually removing any search results, and we would expect users to at least have an engagement rate <a href="https://en.wiktionary.org/wiki/in_the_ballpark">in the same ballpark</a>, and it is interesting to see a similar negative difference on Italian Wikipedia also. From a technical implementation perspective, there should not have been anything particular about those two wikis that impacted event logging or display of results. Perhaps there is a cultural difference in task/intent – such that when users saw previews of results from the other projects, perhaps they learned what they wanted to learn, and with their curiosity satisfied, did not feel the need to click on any results – but that would require considerable human-computer interaction research to confirm or reject.</p>
 <p>We also suspect that the high zero results rate for each of the sister projects for these languages may have been responsible for the few sister-project clicks. As shown in Table 6 in the <a href="#engagement">Engagement</a> analysis, there is evidence that suggests a positive relationship between number of sister projects in the sidebar and clicks on those cross-wiki results.</p>
+</div>
+<div id="acknowledgements" class="section level1">
+<h1>Acknowledgements</h1>
+<p>Finally, we would like to thank our colleagues Trey Jones (Software Engineer, Wikimedia Foundation) and Chelsy Xie (Data Analyst, Wikimedia Foundation) for their reviews of and feedback on this report.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
