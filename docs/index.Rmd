@@ -366,7 +366,7 @@ We employed the *binom* [@R-binom], *LearnBayes* [@R-learnbayes], *conting* [@R-
 
 # Results
 
-After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of `r dplyr::n_distinct(searches$session_id, searches$group, searches$wiki)` search sessions (see `r table_caps("Session Counts", display = "cite")` for the full breakdown by wiki and group). `r table_caps("Click Counts", display = "cite")` breaks down the counts of clicks on same-wiki results (e.g. a Italian Wikipedia visitor clicking on a Italian Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).
+After the test has concluded on `r format(max(searches$date), "%d %B %Y")`, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of `r dplyr::n_distinct(searches$session_id, searches$group, searches$wiki)` search sessions (see `r table_caps("Session Counts", display = "cite")` for the full breakdown by wiki and group). `r table_caps("Click Counts", display = "cite")` breaks down the counts of clicks on same-wiki results (e.g. a Italian Wikipedia visitor clicking on a Italian Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).
 
 ```{r summary_stats_data}
 session_counts <- searches %>%

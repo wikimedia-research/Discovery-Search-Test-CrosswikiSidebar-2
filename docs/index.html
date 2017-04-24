@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2017-04-21" />
+<meta name="date" content="2017-04-24" />
 
 <title>Second Test Of Cross-wiki Search</title>
 
@@ -292,7 +292,7 @@ Product Manager (Search Backend), Wikimedia Foundation<br><h4 class="author"><em
 <address class="author_afil">
 Data Analyst, Wikimedia Foundation<br><h4 class="author"><em>Deb Tankersley</em></h4>
 <address class="author_afil">
-Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>21 April 2017</em></h4>
+Product Manager (Analysis, Search Frontend), Wikimedia Foundation<br><h4 class="date"><em>24 April 2017</em></h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
 <p>Discovery’s Frontend and Backend Search teams ran an A/B test from 17 March 2017 to 27 March 2017 to assess the effectiveness of performing cross-wiki searches and showing results from sister projects (such as Wikisource and Wikiquote) to randomly selected users on Arabic, Catalan, French, German, Italian, Persian, Polish, and Russian Wikipedias. We found that relatively few users clicked on the cross-wiki results and that overall engagement varied greatly across the wikis. For example, Test group users were more likely to engage with their (cross-wiki and same-wiki) search results than the Control group were with their (same-wiki only) results on Arabic and Polish Wikipedias; counter-intuitively, the opposite was true on German and Italian Wikipedias. Given that we did observe a positive difference in engagement in 5 out of 8 wikis, Analysis’s recommendation is to move forward with the cross-wiki search project. That is, there does not appear to be overwhelming evidence that we should <em>not</em> continue with the cross-wiki search project, and we are left to wonder if – perhaps – there are cultural differences at play, but this would require research (see Discussion).</p>
@@ -589,7 +589,7 @@ x &lt;-<span class="st"> </span><span class="kw">plot</span>(visitor_flow, <span
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<p>After the test has concluded on 22 February 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of 42278 search sessions (see Table 2 for the full breakdown by wiki and group). Table 3 breaks down the counts of clicks on same-wiki results (e.g. a Italian Wikipedia visitor clicking on a Italian Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).</p>
+<p>After the test has concluded on 27 March 2017, we processed the collected data and filtered out duplicated events, extraneous search engine result pages (SERPs), and kept only the searches for which we had both event logging (EL) data and logs of searches (Cirrus requests). This left us with a total of 42278 search sessions (see Table 2 for the full breakdown by wiki and group). Table 3 breaks down the counts of clicks on same-wiki results (e.g. a Italian Wikipedia visitor clicking on a Italian Wikipedia article) and clicks on sister-projects results (e.g. an Italian Wikipedia visitor clicking on an Italian Wikinews article).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">session_counts &lt;-<span class="st"> </span>searches <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(<span class="dt">Wiki =</span> wiki, group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">sessions =</span> <span class="kw">length</span>(<span class="kw">unique</span>(session_id))) <span class="op">%&gt;%</span>
